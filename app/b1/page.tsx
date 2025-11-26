@@ -89,12 +89,13 @@ const SalesPage: React.FC = () => {
           </button>
 
           <div className="mt-12 opacity-90">
-            {/* Placeholder for Hero Image */}
-            <div className="w-full max-w-2xl mx-auto h-64 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-700">
-              <div className="text-center text-slate-500">
-                <span className="block mb-2">Image of couple looking thoughtful/worried</span>
-                <span className="text-sm">(Replace with high-quality photo)</span>
-              </div>
+            {/* --- IMAGEM ATUALIZADA AQUI --- */}
+            <div className="w-full max-w-4xl mx-auto rounded-xl overflow-hidden shadow-2xl border-4 border-slate-700/50">
+              <img 
+                src="https://fv5-2.files.fm/thumb_show.php?i=ke2rtz5ntc&view&v=1&PHPSESSID=6a41ad6b2e99c7b72d067d377ce7ac969dcf5cae" 
+                alt="Couple looking thoughtful and worried about their relationship" 
+                className="w-full h-auto object-cover"
+              />
             </div>
           </div>
         </div>
