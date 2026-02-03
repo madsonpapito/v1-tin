@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { User, CheckCircle, Heart, MessageCircle, Lock, AlertTriangle, Wifi, Instagram, Whatsapp, Tinder, LockOpen } from "lucide-react"
+import { useFacebookTracking } from "@/hooks/useFacebookTracking"
 
 // ==========================================================
 // DADOS DOS PERFIS E IMAGENS
@@ -134,6 +135,9 @@ export default function Step2() {
   const [loadingProgress, setLoadingProgress] = useState(0)
   const debounceTimer = useRef<NodeJS.Timeout | null>(null)
   const [timeLeft, setTimeLeft] = useState(5 * 60)
+
+  // Hook para Facebook Tracking - envia dados enriquecidos ao dataLayer
+  const { trackEvent, trackInitiateCheckout } = useFacebookTracking()
 
   // Estados para armazenar os resultados sorteados
   const [randomizedResults, setRandomizedResults] = useState<
@@ -294,6 +298,15 @@ export default function Step2() {
     }
 
     fetchPosts()
+
+    // Facebook Tracking: Envia evento com gênero do usuário (inverso do alvo) e dados enriquecidos
+    // Se o alvo é masculino, o usuário provavelmente é feminino e vice-versa
+    const userGender = selectedGender === 'male' ? 'female' : selectedGender === 'female' ? 'male' : undefined;
+    trackEvent('ViewContent', { gender: userGender }, {
+      content_name: 'Instagram Analysis Started',
+      content_category: 'Engagement',
+      target_gender: selectedGender,
+    });
 
     setStep(2)
     setLoadingProgress(0)
@@ -646,6 +659,11 @@ export default function Step2() {
         {/* --- MAIN BUTTON AND PRICE --- */}
         <a
           href="https://pay.mycheckoutt.com/0198c1be-98b4-7315-a3bc-8c0fa9120e5c?ref="
+          onClick={() => {
+            // Facebook Tracking: Envia evento InitiateCheckout com dados enriquecidos
+            const userGender = selectedGender === 'male' ? 'female' : selectedGender === 'female' ? 'male' : undefined;
+            trackInitiateCheckout(37, 'USD', { gender: userGender });
+          }}
           className="mt-6 block w-full bg-green-500 hover:bg-green-600 text-white font-bold text-lg py-4 rounded-lg transition-colors shadow-lg hover:shadow-xl"
         >
           🔓 YES, I WANT THE COMPLETE REPORT

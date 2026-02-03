@@ -8,6 +8,8 @@ import Script from "next/script"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Lock, CheckCircle, Loader2, MapPin, X, CheckCheck, AlertTriangle, LockOpen } from 'lucide-react'
+import { useFacebookTracking } from '@/hooks/useFacebookTracking'
+
 
 // =======================================================
 // HELPER COMPONENTS
@@ -289,7 +291,7 @@ export default function U1() {
 
   // NOVO ESTADO PARA GÊNERO
   const [selectedGender, setSelectedGender] = useState<'Male' | 'Female' | 'Non-binary'>('Female');
-  
+
   const [isLoadingStarted, setIsLoadingStarted] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState("")
   const [selectedCountry, setSelectedCountry] = useState(countries.find(c => c.name === "United States") || countries[0])
@@ -300,17 +302,17 @@ export default function U1() {
   const [isPhotoPrivate, setIsPhotoPrivate] = useState(false)
   const [photoError, setPhotoError] = useState("")
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null)
-  
+
   const [progress, setProgress] = useState(0)
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [isCompleted, setIsCompleted] = useState(false)
   const [visibleSteps, setVisibleSteps] = useState<number>(1)
   const [currentSteps, setCurrentSteps] = useState<ProgressStep[]>([])
-  
+
   const [location, setLocation] = useState<{ lat: number; lng: number; city: string; country: string } | null>(null)
   const [isLoadingLocation, setIsLoadingLocation] = useState(true)
   const [selectedConvoIndex, setSelectedConvoIndex] = useState<number | null>(null)
-  
+
   const [timeLeft, setTimeLeft] = useState(5 * 60);
 
   const formatTime = (seconds: number) => {
@@ -334,14 +336,14 @@ export default function U1() {
       { img: `/images/${genderPath}/2-${suffix}.png`, name: "Blocked 🔒", msg: "Suspicious audio detected", time: "2 days ago", popupName: "Blocked", chatData: [{ type: "incoming", content: "Hey my love", time: "10:21 PM" }, { type: "outgoing", content: "I'm here, my love", time: "10:27 PM" }, { type: "incoming", content: "Blocked content", time: "10:29 PM", isBlocked: true }] as Message[] },
       { img: `/images/${genderPath}/3-${suffix}.png`, name: "Blocked 🔒", msg: "Suspicious photos found", time: "3 days ago", popupName: "Blocked", chatData: [{ type: "incoming", content: "Hi, how have you been?", time: "11:45 AM" }, { type: "outgoing", content: "I'm fine, thanks! What about you?", time: "11:47 AM" }, { type: "incoming", content: "Blocked content", time: "11:50 AM", isBlocked: true }] as Message[] },
     ];
-    
-    const media = [ `/images/${genderPath}/4-${suffix}.png`, `/images/${genderPath}/5-${suffix}.png`, `/images/${genderPath}/6-${suffix}.png`, `/images/${genderPath}/7-${suffix}.png`, `/images/${genderPath}/8-${suffix}.png`, `/images/${genderPath}/9-${suffix}.png`,];
+
+    const media = [`/images/${genderPath}/4-${suffix}.png`, `/images/${genderPath}/5-${suffix}.png`, `/images/${genderPath}/6-${suffix}.png`, `/images/${genderPath}/7-${suffix}.png`, `/images/${genderPath}/8-${suffix}.png`, `/images/${genderPath}/9-${suffix}.png`,];
 
     return { reportConversations: conversations, reportMedia: media };
   }, [selectedGender]);
-  
+
   const suspiciousKeywords = [{ word: "Naughty", count: 13 }, { word: "Love", count: 22 }, { word: "Secret", count: 7 }, { word: "Hidden", count: 11 }, { word: "Don't tell", count: 5 }]
-  
+
   const filteredCountries = useMemo(() => countries.filter((c) => c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.includes(countrySearch)), [countrySearch])
 
   const fetchWhatsAppPhoto = async (phone: string) => {
@@ -350,11 +352,11 @@ export default function U1() {
     setPhotoError("")
     setProfilePhoto(null)
     // Nota: Não resetamos isPhotoPrivate para falso imediatamente aqui, pois queremos manter o status da requisição
-    
+
     try {
       const response = await fetch("/api/whatsapp-photo", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone }), })
       const data = await response.json()
-      
+
       // Lógica Atualizada: Se a foto for privada, definimos o placeholder mas NÃO tratamos como erro fatal
       if (data?.is_photo_private) {
         setProfilePhoto("/placeholder.svg")
@@ -372,7 +374,7 @@ export default function U1() {
 
       setProfilePhoto(data.result)
       setIsPhotoPrivate(false)
-      
+
     } catch (error) {
       console.error("Error fetching photo:", error)
       setProfilePhoto("/placeholder.svg")
@@ -402,7 +404,7 @@ export default function U1() {
     setPhoneNumber("")
     setProfilePhoto(null)
     setPhotoError("")
-    setIsPhotoPrivate(false) 
+    setIsPhotoPrivate(false)
     if (debounceTimeout) clearTimeout(debounceTimeout)
   }
 
@@ -489,7 +491,7 @@ export default function U1() {
       clearInterval(stepTimer)
     }
   }, [isLoadingStarted, isCompleted, steps])
-  
+
   useEffect(() => {
     if (isCompleted && timeLeft > 0) {
       const timer = setInterval(() => {
@@ -502,10 +504,10 @@ export default function U1() {
   useEffect(() => {
     if (isCompleted) {
       if (typeof (window as any).checkoutElements !== 'undefined') {
-        try { 
-          (window as any).checkoutElements.init('salesFunnel').mount('#hotmart-sales-funnel'); 
-        } catch (e) { 
-          console.error("Failed to mount Hotmart widget:", e); 
+        try {
+          (window as any).checkoutElements.init('salesFunnel').mount('#hotmart-sales-funnel');
+        } catch (e) {
+          console.error("Failed to mount Hotmart widget:", e);
         }
       }
     }
@@ -517,7 +519,7 @@ export default function U1() {
       const finalPhoto = profilePhoto || "/placeholder.svg"
       localStorage.setItem("profilePhoto", finalPhoto)
       localStorage.setItem("phoneNumber", fullNumber)
-      localStorage.setItem("selectedGender", selectedGender) 
+      localStorage.setItem("selectedGender", selectedGender)
       setProfilePhoto(finalPhoto)
       setIsLoadingStarted(true)
     } else {
@@ -533,75 +535,72 @@ export default function U1() {
           <span className="text-yellow-300">Your payment is still being processed.</span>
         </p>
       </div>
-      
+
       <Script src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js" strategy="afterInteractive" />
 
-     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4 py-12">
-  <main className="w-full max-w-md mx-auto text-center space-y-8">
-    
-    <p className="text-lg text-gray-800">
-      <span className="font-bold text-red-600">ATTENTION!</span> Our system has identified that many of the new Instagram conversations are being completed on WhatsApp.
-    </p>
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4 py-12">
+        <main className="w-full max-w-md mx-auto text-center space-y-8">
 
-    <div className="flex items-center justify-center gap-2 text-green-500 font-semibold text-lg">
-      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.051 3.488" />
-      </svg>
-      <span>WhatsApp</span>
-    </div>
-          
+          <p className="text-lg text-gray-800">
+            <span className="font-bold text-red-600">ATTENTION!</span> Our system has identified that many of the new Instagram conversations are being completed on WhatsApp.
+          </p>
+
+          <div className="flex items-center justify-center gap-2 text-green-500 font-semibold text-lg">
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.051 3.488" />
+            </svg>
+            <span>WhatsApp</span>
+          </div>
+
           <div className="mx-auto mb-6 h-32 w-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
             {isLoadingPhoto ? <Loader2 className="h-10 w-10 text-gray-500 animate-spin" /> : profilePhoto ? <Image src={profilePhoto || "/placeholder.svg"} alt="WhatsApp Profile" width={128} height={128} className="object-cover h-full w-full" unoptimized onError={() => setProfilePhoto("/placeholder.svg")} /> : <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>}
           </div>
-          
+
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Congratulations, you've earned<br />1 free access!</h1>
             <p className="text-lg text-gray-500">Enter the number below and start silent monitoring.</p>
           </div>
 
           <div className="w-full space-y-6">
-            
+
             <div className="w-full space-y-4 text-left">
-  <h2 className="font-semibold text-gray-800 text-lg">What gender are they?</h2>
-  <div className="grid grid-cols-3 gap-3">
-    
-    <button
-      onClick={() => setSelectedGender('Male')}
-      className={`flex flex-col items-center justify-center gap-2 p-4 bg-white border rounded-xl shadow-sm transition-all duration-200 ${
-        selectedGender === 'Male'
-          ? 'border-blue-500 ring-2 ring-blue-500/20'
-          : 'border-gray-200 hover:border-gray-300'
-      }`}
-    >
-      <span className="text-5xl">👨🏻</span>
-      <span className="font-medium text-gray-700">Male</span>
-    </button>
+              <h2 className="font-semibold text-gray-800 text-lg">What gender are they?</h2>
+              <div className="grid grid-cols-3 gap-3">
 
-    <button
-      onClick={() => setSelectedGender('Female')}
-      className={`flex flex-col items-center justify-center gap-2 p-4 bg-white border rounded-xl shadow-sm transition-all duration-200 ${
-        selectedGender === 'Female'
-          ? 'border-blue-500 ring-2 ring-blue-500/20'
-          : 'border-gray-200 hover:border-gray-300'
-      }`}
-    >
-      <span className="text-5xl">👩🏻</span>
-      <span className="font-medium text-gray-700">Female</span>
-    </button>
+                <button
+                  onClick={() => setSelectedGender('Male')}
+                  className={`flex flex-col items-center justify-center gap-2 p-4 bg-white border rounded-xl shadow-sm transition-all duration-200 ${selectedGender === 'Male'
+                    ? 'border-blue-500 ring-2 ring-blue-500/20'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                >
+                  <span className="text-5xl">👨🏻</span>
+                  <span className="font-medium text-gray-700">Male</span>
+                </button>
 
-    <button
-      onClick={() => setSelectedGender('Non-binary')}
-      className={`flex flex-col items-center justify-center gap-2 p-4 bg-white border rounded-xl shadow-sm transition-all duration-200 ${
-        selectedGender === 'Non-binary'
-          ? 'border-blue-500 ring-2 ring-blue-500/20'
-          : 'border-gray-200 hover:border-gray-300'
-      }`}
-    >
-      <span className="text-5xl">🧑🏻</span>
-      <span className="font-medium text-gray-700">Non-binary</span>
-    </button>
-  </div>
-</div>
+                <button
+                  onClick={() => setSelectedGender('Female')}
+                  className={`flex flex-col items-center justify-center gap-2 p-4 bg-white border rounded-xl shadow-sm transition-all duration-200 ${selectedGender === 'Female'
+                    ? 'border-blue-500 ring-2 ring-blue-500/20'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                >
+                  <span className="text-5xl">👩🏻</span>
+                  <span className="font-medium text-gray-700">Female</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedGender('Non-binary')}
+                  className={`flex flex-col items-center justify-center gap-2 p-4 bg-white border rounded-xl shadow-sm transition-all duration-200 ${selectedGender === 'Non-binary'
+                    ? 'border-blue-500 ring-2 ring-blue-500/20'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                >
+                  <span className="text-5xl">🧑🏻</span>
+                  <span className="font-medium text-gray-700">Non-binary</span>
+                </button>
+              </div>
+            </div>
 
             <div className="flex items-center bg-white rounded-xl border-2 border-gray-300 shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition-all">
               <div className="relative">
@@ -611,11 +610,11 @@ export default function U1() {
               <div className="h-8 w-px bg-gray-200"></div>
               <Input type="tel" placeholder={selectedCountry.placeholder} value={phoneNumber} onChange={handlePhoneInputChange} className="flex-1 h-14 text-lg border-none bg-transparent focus:ring-0" />
             </div>
-            
+
             <Button onClick={handleStartLoadingProcess} disabled={!phoneNumber.trim() || isLoadingPhoto || isLoadingStarted} className="w-full h-16 bg-green-500 hover:bg-green-600 text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 disabled:bg-green-400 disabled:cursor-not-allowed"><Lock className="h-6 w-6" /> Clone WhatsApp Now</Button>
-            
+
             {photoError && <p className="text-red-500 text-sm -mt-4">{photoError}</p>}
-            
+
           </div>
 
           {isLoadingStarted && (
@@ -651,7 +650,7 @@ export default function U1() {
                     <div className="bg-white rounded-lg p-4 border border-gray-200"><h2 className="text-lg font-semibold text-gray-800 mb-2">Recovered Media</h2><p className="text-sm text-gray-600 mb-4"><span className="font-semibold text-red-500">247 deleted photos</span> were found that may contain sensitive content.</p><div className="grid grid-cols-3 gap-3">{reportMedia.map((image, index) => (<div key={index} className="aspect-square relative rounded-lg overflow-hidden"><Image src={image || "/placeholder.svg"} alt={`Recovered media ${index + 1}`} fill className="object-cover" /></div>))}</div></div>
                     <div className="bg-white rounded-lg p-4 border border-gray-200"><h2 className="text-lg font-semibold text-gray-800 mb-2">Suspicious Keywords</h2><p className="text-sm text-gray-600 mb-4">The system scanned <span className="font-semibold text-red-500">4,327 messages</span> and identified several keywords.</p><div className="space-y-1">{suspiciousKeywords.map((item, index) => (<div key={index} className="flex items-center justify-between py-2 border-b last:border-b-0"><span className="text-lg text-gray-800">"{item.word}"</span><div className="flex items-center justify-center w-7 h-7 bg-green-500 rounded-full text-white text-sm font-bold">{item.count}</div></div>))}</div></div>
                     <div className="bg-white rounded-lg p-4 border border-gray-200"><h2 className="text-lg font-semibold text-gray-800 mb-2">Suspicious Location</h2><p className="text-sm text-gray-600 mb-4">The device location was tracked. Check below:</p>{isLoadingLocation ? <div className="text-center p-10 h-96 flex items-center justify-center"><p>Detecting location...</p></div> : <RealtimeMap lat={location?.lat ?? defaultLocation.lat} lng={location?.lng ?? defaultLocation.lng} city={location?.city ?? defaultLocation.city} country={location?.country ?? defaultLocation.country} />}</div>
-                    
+
                     <div className="bg-white p-5 rounded-lg shadow-xl text-center border border-gray-200">
                       <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-cyan-500 flex items-center justify-center mb-4">
                         <LockOpen className="text-white" size={32} />
@@ -664,7 +663,7 @@ export default function U1() {
                         <p className="text-4xl font-mono font-bold my-1 text-red-600">{formatTime(timeLeft)}</p>
                         <p className="text-xs text-red-700">After the time expires, this report will be permanently deleted for privacy reasons. This offer cannot be recovered at a later date.</p>
                       </div>
-                      
+
                       <div id="hotmart-sales-funnel" className="w-full pt-4"></div>
                     </div>
                   </div>
