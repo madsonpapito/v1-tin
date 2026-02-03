@@ -235,7 +235,7 @@ export default function Step1Unisex() {
                         {/* Testimonial 2 - Male */}
                         <div className="bg-white p-6 rounded-xl shadow-lg text-left">
                             <div className="flex items-center mb-4">
-                                <Image src="/images/man1.jpg" alt="Michael" width={48} height={48} className="rounded-full mr-4" />
+                                <Image src="/images/p1.jpg" alt="Michael" width={48} height={48} className="rounded-full mr-4" />
                                 <div>
                                     <p className="font-bold">Michael, 41</p>
                                     <p className="text-sm text-gray-500">Investigation completed January 2026</p>

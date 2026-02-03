@@ -1,4 +1,4 @@
-import Step1 from "../step-1"
+import Step1 from "@/components/step-1-unisex"
 
 export default function Page() {
   return <Step1 />
