@@ -521,7 +521,7 @@ export default function Step2() {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       console.error("[v0] Failed to load image for post", index, "URL:", imageUrl)
-                      e.currentTarget.src = "/instagram-post-lifestyle.png"
+                      e.currentTarget.src = "/placeholder.svg"
                     }}
                   />
                 </div>
