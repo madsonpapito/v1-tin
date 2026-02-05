@@ -504,8 +504,11 @@ export default function Step2() {
           <p className="font-mono text-xs text-yellow-600 text-center">[STATUS] Searching for connected accounts...</p>
           <div className="grid grid-cols-3 gap-2">
             {instagramPosts.slice(0, visiblePosts).map((post, index) => {
-              const imageUrl = post.imageUrl || "/placeholder.svg?height=200&width=200"
-              console.log("[v0] Rendering post", index, "with image:", imageUrl)
+              // Use proxy to avoid CORS/403 issues with Instagram/CDN images
+              const originalUrl = post.imageUrl || ""
+              const imageUrl = originalUrl ? `/api/proxy-image?url=${encodeURIComponent(originalUrl)}` : "/placeholder.svg?height=200&width=200"
+
+              console.log("[v0] Rendering post", index, "original:", originalUrl)
 
               return (
                 <div
