@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { CheckCircle, AlertTriangle, Lock, LockOpen, Heart, MessageCircle, Info } from "lucide-react"
 import { useFacebookTracking } from "@/hooks/useFacebookTracking"
 
@@ -12,7 +12,9 @@ const defaultMatchesData = [
   { name: "Mila", age: 26, lastSeen: "6h ago", avatar: "/images/male/tinder/5.jpg", verified: true, identity: "Bisexual", distance: "2 km", bio: "Part dreamer, part doer, all about good vibes. Ready to make some memories?", zodiac: "Virgo", mbti: "KU", passion: "Coffee", interests: ["Hiking", "Green Living", "Live Music", "Pottery"] },
   { name: "John", age: 25, lastSeen: "4h ago", avatar: "/images/female/tinder/5.jpg", verified: true, identity: "Bisexual", distance: "2 km", bio: "Half adrenaline junkie, half cozy blanket enthusiast. What’s your vibe?", zodiac: "Leo", mbti: "BU", passion: "Fitness", interests: ["Meditation", "Books", "Wine", "Music"] },
   { name: "Harper", age: 21, lastSeen: "3h ago", avatar: "/images/male/tinder/3.jpg", verified: false, identity: "Woman", distance: "5 km", bio: "Just a girl who loves sunsets and long walks on the beach. Looking for someone to share adventures with.", zodiac: "Leo", mbti: "UVA", passion: "Yoga", interests: ["Travel", "Photography", "Podcasts"] },
-  { name: "Will", age: 23, lastSeen: "2h ago", avatar: "/images/female/tinder/3.jpg", verified: true, identity: "Man", distance: "8 km", bio: "Fluent in sarcasm and movie quotes. Let's find the best pizza place in town.", zodiac: "Gemini", mbti: "OHY", passion: "Baking", interests: ["Concerts", "Netflix", "Dogs"] }
+  { name: "Will", age: 23, lastSeen: "2h ago", avatar: "/images/female/tinder/3.jpg", verified: true, identity: "Man", distance: "8 km", bio: "Fluent in sarcasm and movie quotes. Let's find the best pizza place in town.", zodiac: "Gemini", mbti: "OHY", passion: "Baking", interests: ["Concerts", "Netflix", "Dogs"] },
+  { name: "Luna", age: 24, lastSeen: "5h ago", avatar: "/images/male/tinder/6.jpg", verified: false, identity: "Woman", distance: "4 km", bio: "Night owl with a passion for stargazing. Let me show you the constellations.", zodiac: "Pisces", mbti: "INFP", passion: "Astronomy", interests: ["Space", "Photography", "Coffee"] },
+  { name: "Alex", age: 28, lastSeen: "Online", avatar: "/images/female/tinder/6.jpg", verified: true, identity: "Man", distance: "3 km", bio: "Chef by profession, adventurer by heart. Always up for a new recipe or trail.", zodiac: "Scorpio", mbti: "ENFJ", passion: "Cooking", interests: ["Travel", "Food", "Hiking"] }
 ]
 
 const femaleMatchesData = [
@@ -42,12 +44,22 @@ const maleCensoredPhotos = ["/images/female/tinder/censored/censored-h-1.jpg", "
 export default function DatingScanner() {
   const [step, setStep] = useState(1)
   const [selectedGender, setSelectedGender] = useState<string | null>(null)
+  const [ageRange, setAgeRange] = useState<string | null>(null)
+  const [relationshipStatus, setRelationshipStatus] = useState<string | null>(null)
+  const [suspicionLevel, setSuspicionLevel] = useState<string | null>(null)
+  const [redFlags, setRedFlags] = useState<string[]>([])
   const [imageUploaded, setImageUploaded] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [loadingProgress, setLoadingProgress] = useState(0)
+  const [scanPhase, setScanPhase] = useState(0)
   const [location, setLocation] = useState("your city")
   const [timeLeft, setTimeLeft] = useState(5 * 60)
   const [selectedMatch, setSelectedMatch] = useState<any | null>(null)
+  const checkoutRef = useRef<HTMLDivElement>(null)
+
+  const scrollToCheckout = useCallback(() => {
+    checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [])
 
   const { trackEvent, trackInitiateCheckout } = useFacebookTracking()
 
@@ -91,6 +103,19 @@ export default function DatingScanner() {
   const startInvestigation = () => {
     setStep(2)
 
+    // Save survey responses for analytics
+    fetch('/api/survey-responses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        gender: selectedGender,
+        ageRange,
+        relationshipStatus,
+        suspicionLevel,
+        redFlags
+      })
+    }).catch(err => console.log('Survey save error', err))
+
     // Tracking
     const userGender = selectedGender === 'male' ? 'female' : selectedGender === 'female' ? 'male' : undefined;
     trackEvent('ViewContent', { gender: userGender }, {
@@ -99,20 +124,27 @@ export default function DatingScanner() {
       target_gender: selectedGender,
     });
 
-    // Simulate Loading
-    const interval = setInterval(() => {
-      setLoadingProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          return 100
-        }
-        return prev + Math.random() * 15
-      })
-    }, 500)
+    // Simulate Loading with scan phases
+    const scanSteps = [1, 2, 3, 4, 5]
+    scanSteps.forEach((phase, i) => {
+      setTimeout(() => {
+        setScanPhase(phase)
+        setLoadingProgress(((i + 1) / scanSteps.length) * 80)
+      }, (i + 1) * 1400)
+    })
 
+    // Transition to intermediate results (step 2.5)
+    setTimeout(() => {
+      setScanPhase(6)
+      setLoadingProgress(100)
+    }, 8000)
+
+    // Transition to full results
     setTimeout(() => {
       setStep(3)
-    }, 4000)
+      setScanPhase(0)
+      setLoadingProgress(0)
+    }, 13000)
   }
 
   const getActiveData = () => {
@@ -123,32 +155,39 @@ export default function DatingScanner() {
 
   const { matches, photos } = getActiveData()
 
+  const toggleRedFlag = (flag: string) => {
+    setRedFlags(prev => prev.includes(flag) ? prev.filter(f => f !== flag) : [...prev, flag])
+  }
+
+  const allQuestionsAnswered = selectedGender && ageRange && relationshipStatus && suspicionLevel && redFlags.length > 0 && imageUploaded
+
   // --------------------------------------------------------
   // RENDER STEP 1: INPUT
   // --------------------------------------------------------
   const renderInputStep = () => (
     <div className="space-y-6 animate-fade-in w-full text-center">
-      <p className="text-lg text-gray-800 pt-2">
-        <span className="font-bold text-red-600">ATTENTION!</span> Our system has identified that this user is registered on dating apps. Use our image scanner to verify.
-      </p>
-
-      {/* Upload Box */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Upload Their Photo for Facial Recognition</h2>
-        <label className="w-40 h-40 mx-auto flex items-center justify-center border-2 border-dashed border-blue-400 rounded-xl cursor-pointer hover:bg-blue-50 transition-colors relative overflow-hidden">
-          <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
-          {imagePreview ? (
-            <img src={imagePreview} className="w-full h-full object-cover absolute" />
-          ) : (
-            <div className="text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></svg>
-            </div>
-          )}
-        </label>
-        <p className="text-sm text-gray-500 mt-4">We'll scan across all dating platforms to find matching profiles - even ones they think are hidden.</p>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-b from-[#6C5CE7] to-[#7B6CF0] rounded-2xl p-8 mb-2 shadow-lg">
+        {/* Wireless Icon */}
+        <div className="mx-auto w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-5 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6C5CE7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+            <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+            <circle cx="12" cy="20" r="1" fill="#6C5CE7" />
+          </svg>
+        </div>
+        {/* Title */}
+        <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+          🔍 Help Us Find What They&apos;re Hiding
+        </h1>
+        {/* Subtitle */}
+        <p className="text-white/80 mt-3 text-sm sm:text-base">
+          The more details you provide, the deeper we can dig. Everything stays 100% anonymous.
+        </p>
       </div>
 
-      {/* Gender Selector */}
+      {/* 1. Gender Selector */}
       <div className="bg-white rounded-2xl shadow-lg p-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4">What gender are they?</h2>
         <div className="grid grid-cols-3 gap-4">
@@ -168,9 +207,128 @@ export default function DatingScanner() {
         </p>
       </div>
 
+      {/* 2. Age Range */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">How old are they?</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { value: '18-24', label: '18-24', emoji: '🧑' },
+            { value: '25-34', label: '25-34', emoji: '👤' },
+            { value: '35-44', label: '35-44', emoji: '🧔' },
+            { value: '45+', label: '45+', emoji: '👴' },
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setAgeRange(opt.value)}
+              className={`p-4 border rounded-xl transition-all duration-200 ${ageRange === opt.value ? 'border-blue-500 bg-blue-100 ring-2 ring-blue-300' : 'border-gray-200 hover:border-gray-400'}`}
+            >
+              <span className="text-2xl block mb-1">{opt.emoji}</span>
+              <span className="font-semibold text-gray-700 text-sm">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-gray-500 mt-4">
+          Age helps us refine the search across the right dating platforms.
+        </p>
+      </div>
+
+      {/* 3. Relationship Status */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">What&apos;s your current relationship status?</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { value: 'married', label: 'Married', emoji: '💍' },
+            { value: 'relationship', label: 'In a relationship', emoji: '❤️' },
+            { value: 'complicated', label: "It's complicated", emoji: '💔' },
+            { value: 'dating', label: 'Just started dating', emoji: '🌱' },
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setRelationshipStatus(opt.value)}
+              className={`p-4 border rounded-xl transition-all duration-200 text-left ${relationshipStatus === opt.value ? 'border-blue-500 bg-blue-100 ring-2 ring-blue-300' : 'border-gray-200 hover:border-gray-400'}`}
+            >
+              <span className="text-2xl block mb-1">{opt.emoji}</span>
+              <span className="font-semibold text-gray-700 text-sm">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-gray-500 mt-4">
+          This lets us calibrate our detection algorithms based on relationship patterns.
+        </p>
+      </div>
+
+      {/* 3. Suspicion Level */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Have you noticed any suspicious behavior lately?</h2>
+        <div className="grid grid-cols-1 gap-3">
+          {[
+            { value: 'certain', label: "Yes, I'm almost certain", emoji: '🚨' },
+            { value: 'gut', label: 'I have a gut feeling', emoji: '🤔' },
+            { value: 'unsure', label: 'Not sure, but something feels off', emoji: '😟' },
+            { value: 'checking', label: 'Just checking to be safe', emoji: '🔍' },
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setSuspicionLevel(opt.value)}
+              className={`p-4 border rounded-xl transition-all duration-200 flex items-center gap-3 ${suspicionLevel === opt.value ? 'border-blue-500 bg-blue-100 ring-2 ring-blue-300' : 'border-gray-200 hover:border-gray-400'}`}
+            >
+              <span className="text-2xl">{opt.emoji}</span>
+              <span className="font-semibold text-gray-700 text-sm text-left">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-gray-500 mt-4">
+          You&apos;re not paranoid. Trust your instincts — we&apos;ll help you find the proof.
+        </p>
+      </div>
+
+      {/* 4. Red Flags - Multi-select */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-2">Which of these have you noticed?</h2>
+        <p className="text-sm text-gray-500 mb-4">Select all that apply</p>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { value: 'hide_phone', label: 'They hide their phone', emoji: '📱' },
+            { value: 'changed_passwords', label: 'Changed passwords', emoji: '🔒' },
+            { value: 'late_nights', label: 'Unexplained late nights', emoji: '🕐' },
+            { value: 'deleting_messages', label: 'Deleting messages', emoji: '💬' },
+            { value: 'emotionally_distant', label: 'Emotionally distant', emoji: '😶' },
+            { value: 'appearance_change', label: 'Sudden appearance change', emoji: '👔' },
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => toggleRedFlag(opt.value)}
+              className={`p-3 border rounded-xl transition-all duration-200 text-left ${redFlags.includes(opt.value) ? 'border-red-500 bg-red-50 ring-2 ring-red-300' : 'border-gray-200 hover:border-gray-400'}`}
+            >
+              <span className="text-xl block mb-1">{opt.emoji}</span>
+              <span className="font-semibold text-gray-700 text-xs">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-gray-500 mt-4">
+          Each red flag helps our system narrow down the search and find hidden profiles faster.
+        </p>
+      </div>
+
+      {/* 5. Upload Box */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Upload Their Photo for Facial Recognition</h2>
+        <label className="w-40 h-40 mx-auto flex items-center justify-center border-2 border-dashed border-blue-400 rounded-xl cursor-pointer hover:bg-blue-50 transition-colors relative overflow-hidden">
+          <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+          {imagePreview ? (
+            <img src={imagePreview} className="w-full h-full object-cover absolute" />
+          ) : (
+            <div className="text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></svg>
+            </div>
+          )}
+        </label>
+        <p className="text-sm text-gray-500 mt-4">We&apos;ll scan across all dating platforms to find matching profiles - even ones they think are hidden.</p>
+      </div>
+
       <button
         onClick={startInvestigation}
-        disabled={!imageUploaded || !selectedGender}
+        disabled={!allQuestionsAnswered}
         className="w-full text-white font-bold py-4 px-6 rounded-xl shadow-lg flex items-center justify-center gap-3 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed bg-red-600 hover:bg-red-700"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
@@ -182,15 +340,165 @@ export default function DatingScanner() {
   // --------------------------------------------------------
   // RENDER STEP 2: LOADING
   // --------------------------------------------------------
-  const renderLoadingStep = () => (
-    <div className="text-center animate-fade-in space-y-4 py-10">
-      <div className="mx-auto w-16 h-16 animate-spin text-blue-600">
-        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+  const scanStepsData = [
+    { label: 'Tinder, Bumble, Hinge scanning', icon: '🔥' },
+    { label: 'Facial recognition processing', icon: '🧠' },
+    { label: 'Location data analysis', icon: '📍' },
+    { label: 'Message history detection', icon: '💬' },
+    { label: 'Profile cross-reference complete', icon: '✅' },
+  ]
+
+  const scanStatusMessages = [
+    'Initializing scan...',
+    'Checking Tinder activity in your area...',
+    'Running facial recognition...',
+    'Analyzing location patterns...',
+    'Scanning message history...',
+    'Finalizing results...',
+  ]
+
+  const renderLoadingStep = () => {
+    // Phase 6 = intermediate results screen
+    if (scanPhase === 6) {
+      return (
+        <div className="animate-fade-in w-full text-center space-y-5">
+          {/* Header */}
+          <div className="bg-gradient-to-b from-[#6C5CE7] to-[#7B6CF0] rounded-2xl p-8 shadow-lg">
+            <div className="mx-auto w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-5 shadow-md">
+              <AlertTriangle className="w-8 h-8 text-red-500" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+              We Found What You Were Looking For...
+            </h1>
+          </div>
+
+          {/* Alert Card */}
+          <div className="bg-red-50 border-2 border-red-200 p-5 rounded-2xl text-left">
+            <div className="flex items-center gap-3 mb-2">
+              <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0" />
+              <h2 className="font-bold text-red-700 text-lg">ACTIVE DATING PROFILES DETECTED</h2>
+            </div>
+            <p className="text-red-600 text-sm">
+              Our system discovered multiple active profiles linked to this person across 3 different dating platforms.
+            </p>
+          </div>
+
+          {/* Findings */}
+          <div className="bg-white rounded-2xl shadow-lg p-5 text-left space-y-5">
+            <div className="flex items-start gap-3 pb-4 border-b border-gray-100">
+              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-gray-800">Last Active: 18 hours ago</p>
+                <p className="text-sm text-gray-500">Despite claiming they &lsquo;deleted everything&rsquo;</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 pb-4 border-b border-gray-100">
+              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-gray-800">3 Dating Apps Currently Active</p>
+                <p className="text-sm text-gray-500">Tinder, Bumble, and one premium platform</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-gray-800">Recent Conversations Detected</p>
+                <p className="text-sm text-gray-500">Active messaging with multiple matches this week</p>
+              </div>
+            </div>
+          </div>
+
+          {/* What you'll see */}
+          <div className="bg-blue-50 border-2 border-blue-200 p-5 rounded-2xl text-left">
+            <div className="flex items-center gap-2 mb-3">
+              <Info className="w-5 h-5 text-blue-600" />
+              <h3 className="font-bold text-blue-800">What You&apos;ll See in the Full Report:</h3>
+            </div>
+            <ul className="space-y-2 text-sm text-blue-700">
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Screenshots of all active profiles</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Recent conversations and what they&apos;re saying</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Exact locations where they&apos;ve been swiping</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Timeline of all activity (you&apos;ll be shocked)</li>
+            </ul>
+          </div>
+
+          {/* Loading to results */}
+          <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
+            <div className="w-4 h-4 animate-spin">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+            </div>
+            <span>Preparing your complete report...</span>
+          </div>
+
+          <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
+            <Lock className="w-3 h-3" /> Secure and encrypted connection · No traces left behind
+          </p>
+        </div>
+      )
+    }
+
+    // Scanning animation (phases 0-5)
+    return (
+      <div className="animate-fade-in w-full text-center space-y-6">
+        {/* Header */}
+        <div className="bg-gradient-to-b from-[#6C5CE7] to-[#7B6CF0] rounded-2xl p-8 shadow-lg">
+          <div className="mx-auto w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-5 shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6C5CE7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+            🔍 Scanning All Dating Platforms...
+          </h1>
+          <p className="text-white/70 mt-2 text-sm">
+            {scanStatusMessages[Math.min(scanPhase, scanStatusMessages.length - 1)]}
+          </p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-[#6C5CE7] to-[#a78bfa] h-3 rounded-full transition-all duration-700 ease-out"
+              style={{ width: `${Math.min(loadingProgress, 100)}%` }}
+            />
+          </div>
+          <p className="text-sm text-gray-500 mt-2">{Math.min(Math.round(loadingProgress), 100)}% complete</p>
+        </div>
+
+        {/* Scan Steps */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 text-left">
+          <div className="space-y-4">
+            {scanStepsData.map((s, i) => (
+              <div key={i} className={`flex items-center gap-3 transition-all duration-500 ${scanPhase > i ? 'opacity-100' : 'opacity-30'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${scanPhase > i
+                    ? 'bg-green-100 text-green-600'
+                    : scanPhase === i + 1
+                      ? 'bg-purple-100 text-purple-600 animate-pulse'
+                      : 'bg-gray-100 text-gray-400'
+                  }`}>
+                  {scanPhase > i ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : (
+                    <span className="text-sm">{s.icon}</span>
+                  )}
+                </div>
+                <span className={`text-sm font-medium ${scanPhase > i ? 'text-green-700' : scanPhase === i + 1 ? 'text-gray-800' : 'text-gray-400'
+                  }`}>{s.label}</span>
+                {scanPhase === i + 1 && (
+                  <div className="ml-auto w-4 h-4 animate-spin">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6C5CE7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
+          <Lock className="w-3 h-3" /> Secure and encrypted connection · No traces left behind
+        </p>
       </div>
-      <h2 className="text-2xl font-bold text-gray-800">Searching...</h2>
-      <p className="text-gray-600">Cross-referencing image with millions of profiles.<br />This may take a moment.</p>
-    </div>
-  )
+    )
+  }
 
   // --------------------------------------------------------
   // RENDER STEP 3: RESULTS
@@ -237,7 +545,7 @@ export default function DatingScanner() {
         </div>
         <p className="text-sm text-gray-400 mb-5">Tap on a match to view more information</p>
         <div className="space-y-4">
-          {matches.map((m, i) => (
+          {matches.slice(0, 3).map((m, i) => (
             <div key={i} onClick={() => setSelectedMatch(m)} className="flex items-center gap-4 bg-slate-700/50 p-3 rounded-lg cursor-pointer hover:bg-slate-600 transition-colors">
               <img src={m.avatar} alt={m.name} className="w-12 h-12 rounded-full object-cover border-2 border-slate-600" onError={(e) => e.currentTarget.src = '/placeholder.svg'} />
               <div className="flex-grow">
@@ -246,6 +554,40 @@ export default function DatingScanner() {
                 <p className="text-xs font-semibold text-green-400">Active chat: frequently online</p>
               </div>
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Chats */}
+      <div className="bg-gradient-to-b from-slate-800 to-slate-900 text-white p-5 rounded-lg shadow-2xl">
+        <div className="flex items-center gap-2 mb-2">
+          <MessageCircle className="w-5 h-5 text-blue-400" />
+          <h2 className="text-lg font-bold">RECENT CHATS</h2>
+        </div>
+        <p className="text-sm text-gray-400 mb-5">Tap on a conversation to read their messages</p>
+        <div className="space-y-4">
+          {matches.slice(3, 6).map((m, i) => (
+            <div
+              key={i}
+              onClick={scrollToCheckout}
+              className="flex items-center gap-4 bg-slate-700/50 p-3 rounded-lg cursor-pointer hover:bg-slate-600 transition-colors"
+            >
+              <div className="relative">
+                <img src={m.avatar} alt={m.name} className="w-12 h-12 rounded-full object-cover border-2 border-slate-600" onError={(e) => e.currentTarget.src = '/placeholder.svg'} />
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-slate-800"></div>
+              </div>
+              <div className="flex-grow min-w-0">
+                <p className="font-bold">{m.name}</p>
+                <p className="text-sm text-blue-400 flex items-center gap-1">
+                  <span className="w-2 h-2 bg-blue-400 rounded-full inline-block"></span>
+                  Click to read messages...
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                <span className="text-xs text-gray-400">Just now</span>
+                <span className="text-gray-500">⋮</span>
+              </div>
             </div>
           ))}
         </div>
@@ -261,7 +603,7 @@ export default function DatingScanner() {
 
         <div className="flex overflow-x-auto gap-2 scrollbar-hide snap-x">
           {photos.map((src, i) => (
-            <div key={i} className="relative flex-[0_0_80%] aspect-video bg-gray-700 rounded-lg overflow-hidden snap-center">
+            <div key={i} className="relative flex-[0_0_85%] aspect-[3/4] bg-gray-700 rounded-lg overflow-hidden snap-center">
               <img src={src} className="w-full h-full object-cover filter blur-md" onError={(e) => e.currentTarget.src = '/placeholder.svg'} />
               <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-white">
                 <Lock className="w-8 h-8" />
@@ -273,7 +615,7 @@ export default function DatingScanner() {
       </div>
 
       {/* Unlock Widget */}
-      <div className="bg-white p-5 rounded-lg shadow-xl text-center">
+      <div ref={checkoutRef} className="bg-white p-5 rounded-lg shadow-xl text-center">
         <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-cyan-500 flex items-center justify-center mb-4">
           <LockOpen className="text-white w-8 h-8" />
         </div>
@@ -300,6 +642,29 @@ export default function DatingScanner() {
         >
           🔓 YES, I WANT THE COMPLETE REPORT
         </a>
+
+        {/* Testimonial */}
+        <div className="mt-6 flex items-start gap-3 text-left bg-gray-50 p-4 rounded-xl">
+          <img
+            src={selectedGender === 'female' ? '/images/p3.jpg' : '/images/86.jpg'}
+            alt="Verified user"
+            className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 flex-shrink-0"
+          />
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="font-bold text-gray-800 text-sm">
+                {selectedGender === 'female' ? 'James W.' : 'Sarah M.'}
+              </p>
+              <span className="text-xs text-green-600 font-semibold flex items-center gap-0.5">
+                <CheckCircle className="w-3.5 h-3.5" /> Verified User
+              </span>
+            </div>
+            <p className="text-gray-600 text-sm mt-1 italic">
+              &ldquo;I wish I had done this months ago. Would have saved me so much anxiety and wasted time.&rdquo;
+            </p>
+            <p className="mt-1 text-yellow-500 text-sm tracking-wider">⭐⭐⭐⭐⭐</p>
+          </div>
+        </div>
       </div>
     </div>
   )
