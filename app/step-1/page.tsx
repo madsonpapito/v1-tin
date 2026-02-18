@@ -308,12 +308,11 @@ export default function Step1WireframeMatch() {
                         ].map((review, i) => (
                             <div key={i} className="bg-[#0f172a] p-6 rounded-2xl border border-slate-800 text-left">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-600 relative">
-                                        <Image
+                                    <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-600 relative flex-shrink-0">
+                                        <img
                                             src={review.image}
                                             alt={review.name}
-                                            fill
-                                            className="object-cover"
+                                            className="w-full h-full object-cover"
                                         />
                                     </div>
                                     <div>
