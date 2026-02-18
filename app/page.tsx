@@ -302,14 +302,18 @@ export default function HomeWireframeMatch() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: "Sarah", age: 38, role: "Verified User", text: "I found a hidden Tinder profile active 30km away. I confronted him with the proof.", image: "/images/female/user1.jpg" },
-              { name: "Michael", age: 41, role: "Verified User", text: "Worth every penny. The location history showed exactly where she was those nights.", image: "/images/male/user1.jpg" },
-              { name: "Jessica", age: 29, role: "Verified User", text: "The report was incredibly detailed and fast. Confirmed my suspicions and gave me peace of mind.", image: "/images/female/user2.jpg" }
+              { name: "Sarah", age: 38, role: "Verified User", text: "I found a hidden Tinder profile active 30km away. I confronted him with the proof.", image: "/images/f3.jpg" },
+              { name: "Michael", age: 41, role: "Verified User", text: "Worth every penny. The location history showed exactly where she was those nights.", image: "/images/p1.jpg" },
+              { name: "Jessica", age: 29, role: "Verified User", text: "The report was incredibly detailed and fast. Confirmed my suspicions and gave me peace of mind.", image: "/images/f2.jpg" }
             ].map((review, i) => (
               <div key={i} className="bg-[#0f172a] p-6 rounded-2xl border border-slate-800 text-left">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center font-bold text-slate-400 border border-slate-600">
-                    {review.name[0]}
+                  <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-600 relative flex-shrink-0">
+                    <img
+                      src={review.image}
+                      alt={review.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div>
                     <p className="font-bold text-white">{review.name}, {review.age}</p>
