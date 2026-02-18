@@ -5,51 +5,59 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  // Em ambiente de desenvolvimento (localhost), os cabeçalhos da Vercel não existem.
-  // Então, retornamos uma localização padrão para testes.
-  if (process.env.NODE_ENV === 'development') {
-    console.log("Ambiente de desenvolvimento: retornando localização de São Paulo.");
+  // First, try Vercel headers (production)
+  const vercelCity = request.headers.get('x-vercel-ip-city');
+  const vercelCountry = request.headers.get('x-vercel-ip-country');
+  const vercelLat = request.headers.get('x-vercel-ip-latitude');
+  const vercelLon = request.headers.get('x-vercel-ip-longitude');
+
+  if (vercelCity && vercelCountry && vercelLat && vercelLon) {
     return NextResponse.json({
       status: 'success',
-      city: 'São Paulo',
-      country: 'Brazil',
-      region: 'SP',
-      postalCode: '01310-100',
-      lat: -23.5505,
-      lon: -46.6333,
+      city: decodeURIComponent(vercelCity),
+      country: vercelCountry,
+      region: request.headers.get('x-vercel-ip-country-region') || '',
+      postalCode: request.headers.get('x-vercel-ip-postal-code') || '',
+      lat: parseFloat(vercelLat),
+      lon: parseFloat(vercelLon),
     });
   }
 
-  // Em produção na Vercel, lemos os cabeçalhos que a Vercel injeta.
+  // Fallback: fetch real IP geolocation via external API (works in dev too)
   try {
-    const city = request.headers.get('x-vercel-ip-city');
-    const country = request.headers.get('x-vercel-ip-country');
-    const region = request.headers.get('x-vercel-ip-country-region');
-    const postalCode = request.headers.get('x-vercel-ip-postal-code');
-    const lat = request.headers.get('x-vercel-ip-latitude');
-    const lon = request.headers.get('x-vercel-ip-longitude');
+    const forwarded = request.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0].trim() : null;
 
-    // Verificação de segurança: se os headers principais estiverem faltando, retorna erro.
-    if (!city || !country || !lat || !lon) {
-      console.error("Cabeçalhos de geolocalização da Vercel não foram encontrados em produção.");
-      throw new Error("Cabeçalhos da Vercel ausentes.");
-    }
+    // Use ipapi.co — free, no key needed
+    const geoUrl = ip && ip !== '127.0.0.1' && ip !== '::1'
+      ? `https://ipapi.co/${ip}/json/`
+      : `https://ipapi.co/json/`;
 
-    // Retorna os dados da localização lidos diretamente dos cabeçalhos.
+    const geoRes = await fetch(geoUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      cache: 'no-store',
+    });
+
+    if (!geoRes.ok) throw new Error('ipapi.co failed');
+
+    const geo = await geoRes.json();
+
+    if (geo.error) throw new Error(geo.reason || 'ipapi error');
+
     return NextResponse.json({
       status: 'success',
-      city,
-      country,
-      region: region || '', // Estado/região pode ser null em alguns casos
-      postalCode: postalCode || '', // CEP pode ser null em alguns casos
-      lat: parseFloat(lat),
-      lon: parseFloat(lon),
+      city: geo.city || 'Unknown',
+      country: geo.country_code || '',
+      region: geo.region || '',
+      postalCode: geo.postal || '',
+      lat: geo.latitude,
+      lon: geo.longitude,
     });
 
   } catch (error: any) {
-    console.error("Erro ao processar cabeçalhos da Vercel:", error.message);
+    console.error("Geolocation error:", error.message);
     return NextResponse.json(
-      { error: 'Erro interno ao processar a geolocalização da Vercel.' },
+      { error: 'Could not determine location.' },
       { status: 500 }
     );
   }

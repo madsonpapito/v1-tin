@@ -11,25 +11,40 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
+    "/step-2/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/step-2/page.js"
+    ],
     "/api/location/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/location/route.js"
     ],
-    "/step-2/page": [
+    "/step-1/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/step-2/page.js"
+      "static/chunks/app/step-1/page.js"
+    ],
+    "/api/whatsapp-photo/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/whatsapp-photo/route.js"
     ],
     "/api/survey-responses/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/survey-responses/route.js"
     ],
-    "/api/whatsapp-photo/route": [
+    "/upsell-1/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/whatsapp-photo/route.js"
+      "static/chunks/app/upsell-1/page.js"
+    ],
+    "/upsell-2/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/upsell-2/page.js"
     ],
     "/api/instagram/profile/route": [
       "static/chunks/webpack.js",
@@ -46,10 +61,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/instagram/posts/route.js"
     ],
-    "/api/proxy-image/route": [
+    "/downsell-1/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/proxy-image/route.js"
+      "static/chunks/app/downsell-1/page.js"
+    ],
+    "/downsell-2/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/downsell-2/page.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }

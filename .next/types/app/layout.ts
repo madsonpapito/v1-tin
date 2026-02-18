@@ -1,4 +1,4 @@
-// File: C:\Users\madso\tinder-zap-insta (ingles)\app\layout.tsx
+// File: C:\corleone_drm\tinder-zap-insta-ingles\app\layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

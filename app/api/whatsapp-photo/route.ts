@@ -25,7 +25,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { phone, countryCode } = await request.json()
+    const body = await request.json()
+    // Support legacy 'phone' and new 'number' fields
+    const phone = body.phone || body.number
+    const countryCode = body.countryCode
 
     if (!phone) {
       return NextResponse.json(

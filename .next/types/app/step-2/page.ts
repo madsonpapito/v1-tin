@@ -1,4 +1,4 @@
-// File: C:\Users\madso\tinder-zap-insta (ingles)\app\step-2\page.tsx
+// File: C:\corleone_drm\tinder-zap-insta-ingles\app\step-2\page.tsx
 import * as entry from '../../../../app/step-2/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

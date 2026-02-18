@@ -65,4 +65,4 @@ export function FacebookTracker({
     return null;
 }
 
-export default FacebookTracker;
+
