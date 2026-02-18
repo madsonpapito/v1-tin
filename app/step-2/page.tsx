@@ -53,6 +53,18 @@ function DatingScannerContent() {
   const [randomMatches, setRandomMatches] = useState<any[]>([])
 
   useEffect(() => {
+    // Fetch user location silently
+    fetch('/api/geo')
+      .then(res => res.json())
+      .then(data => {
+        if (data.city && data.city !== 'Unknown Location') {
+          setLocation(data.city)
+        }
+      })
+      .catch(err => console.error("Geo fetch error:", err))
+  }, [])
+
+  useEffect(() => {
     // Generate matches when component mounts or step changes to 3 (Results)
     // Matches should be opposite gender of the target (suspect)
     if (step === 3 && selectedGender) {
