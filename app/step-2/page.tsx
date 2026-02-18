@@ -873,24 +873,24 @@ function DatingScannerContent() {
           </div>
 
           <h2 className="text-xl font-black text-white uppercase tracking-wide mb-2">UNLOCK FULL DOSSIER</h2>
-          <p className="text-xs text-slate-400 mb-6 px-4">Get instant access to the full report with all the matches and photos exchanged
+          <p className="text-xs text-slate-400 mb-6 px-4">Get instant access to the full report with all the matches and photos exchanged</p>
 
-            <div className="bg-slate-900 border border-slate-800 p-3 rounded-lg mb-6 flex justify-between items-center max-w-[200px] mx-auto">
-              <span className="text-[10px] text-slate-500 uppercase font-bold">Expires:</span>
-              <span className="font-mono font-bold text-rose-500 text-lg">{formatTime(timeLeft)}</span>
-            </div>
+          <div className="bg-slate-900 border border-slate-800 p-3 rounded-lg mb-6 flex justify-between items-center max-w-[200px] mx-auto">
+            <span className="text-[10px] text-slate-500 uppercase font-bold">Expires:</span>
+            <span className="font-mono font-bold text-rose-500 text-lg">{formatTime(timeLeft)}</span>
+          </div>
 
-            <a
-              href="https://pay.mycheckoutt.com/0198c1be-98b4-7315-a3bc-8c0fa9120e5c?ref="
-              onClick={() => {
-                const userGender = selectedGender === 'male' ? 'female' : selectedGender === 'female' ? 'male' : undefined;
-              }}
-              className="block w-full bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] uppercase tracking-widest text-sm"
-            >
-              UNLOCK REPORT NOW
-            </a>
+          <a
+            href="https://pay.mycheckoutt.com/0198c1be-98b4-7315-a3bc-8c0fa9120e5c?ref="
+            onClick={() => {
+              const userGender = selectedGender === 'male' ? 'female' : selectedGender === 'female' ? 'male' : undefined;
+            }}
+            className="block w-full bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] uppercase tracking-widest text-sm"
+          >
+            UNLOCK REPORT NOW
+          </a>
 
-            <p className="text-[10px] text-slate-600 mt-4 font-mono">Secure Payment • 256-bit SSL</p>
+          <p className="text-[10px] text-slate-600 mt-4 font-mono">Secure Payment • 256-bit SSL</p>
         </div>
 
         {/* Testimonial */}
