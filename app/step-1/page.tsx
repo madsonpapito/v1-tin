@@ -11,7 +11,7 @@ export default function Step1WireframeMatch() {
     const router = useRouter();
 
     const handleStart = () => {
-        router.push('/step-2');
+        window.location.href = 'https://rt.tinderchecks.store/preclick';
     };
 
     return (
