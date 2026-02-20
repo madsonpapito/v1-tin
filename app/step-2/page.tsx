@@ -139,6 +139,15 @@ function DatingScannerContent() {
   const startInvestigation = () => {
     setStep(2)
 
+    // RedTrack Tracking
+    try {
+      if (typeof window !== 'undefined' && (window as any).rtk) {
+        (window as any).rtk.track('click', { sub1: 'run_deep_scan_clicked' });
+      }
+    } catch (e) {
+      console.error('RedTrack tracking error:', e);
+    }
+
     // Save analytics
     fetch('/api/survey-responses', {
       method: 'POST',
@@ -902,7 +911,7 @@ function DatingScannerContent() {
           </div>
 
           <a
-            href={`https://pay.mycheckoutt.com/0198c1be-98b4-7315-a3bc-8c0fa9120e5c?ref=${selectedGender || 'unknown'}`}
+            href="https://rt.tinderchecks.store/click"
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] uppercase tracking-widest text-sm relative z-10"
