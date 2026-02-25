@@ -253,6 +253,8 @@ export default function Upsell1Page() {
       const [event, ...params] = e.data;
       if (event === 'setHeightIframeUpsell') {
         const [index, height] = params;
+        // Ignore broken height calculations from hidden state
+        if (Number(height) < 400) return;
         const iframes = document.getElementsByClassName('iframeUpsell');
         if (iframes[index]) {
           (iframes[index] as HTMLIFrameElement).height = height + "px";
@@ -645,13 +647,13 @@ export default function Upsell1Page() {
               {/* MONETIZZE WIDGET CONTAINER */}
               <div className="md-widget-dark w-full flex justify-center py-2 bg-white/5 rounded-lg border border-white/10 min-h-[100px]">
                 <iframe
-                  className="iframeUpsell max-w-full"
+                  className="iframeUpsell max-w-full w-full min-h-[500px]"
                   data-chave="0e79454397a01c1b8017253734878119"
-                  src="https://app.monetizze.com.br/1buyclick_incorporado.php?u=0e79454397a01c1b8017253734878119&i=0"
+                  src={step === 'report' ? "https://app.monetizze.com.br/1buyclick_incorporado.php?u=0e79454397a01c1b8017253734878119&i=0" : ""}
                   sandbox="allow-same-origin allow-scripts allow-top-navigation allow-forms"
                   frameBorder="0"
                   width="100%"
-                  height="400px"
+                  height="500px"
                   title="Monetizze Checkout"
                 ></iframe>
               </div>
