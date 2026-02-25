@@ -1,4 +1,4 @@
-// File: C:\corleone_drm\tinder-zap-insta-ingles\app\api\location\route.ts
+// File: C:\Users\madso\v1- tinder\app\api\location\route.ts
 import * as entry from '../../../../../app/api/location/route.js'
 import type { NextRequest } from 'next/server.js'
 

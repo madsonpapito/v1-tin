@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import Script from 'next/script';
 
 import {
   MessageSquare, User, Loader2, Lock, MapPin, CheckCircle2,
@@ -252,25 +253,7 @@ export default function Upsell1Page() {
     }
   }, [step, timeLeft]);
 
-  // Inject Monetizze script AFTER report step renders
-  useEffect(() => {
-    if (step !== 'report') return;
 
-    // Remove any previous script to force fresh execution
-    const existing = document.getElementById('monetizze-u1-dynamic');
-    if (existing) existing.remove();
-
-    const timer = setTimeout(() => {
-      const script = document.createElement('script');
-      script.id = 'monetizze-u1-dynamic';
-      script.src = 'https://app.monetizze.com.br/upsell_incorporado.php';
-      script.type = 'text/javascript';
-      script.async = true;
-      document.head.appendChild(script);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [step]);
 
 
   const formatTime = (seconds: number) => {
@@ -496,161 +479,164 @@ export default function Upsell1Page() {
         )}
 
         {/* --- STEP 3: REPORT (CYBER UI) --- */}
-        {step === 'report' && (
-          <div className="animate-in slide-in-from-bottom-8 duration-700 space-y-6">
+        <div className={step === 'report' ? 'block animate-in slide-in-from-bottom-8 duration-700 space-y-6' : 'hidden'}>
 
-            {/* Header */}
-            <div className="bg-gradient-to-r from-emerald-600 to-cyan-700 p-4 rounded-t-2xl shadow-lg text-center relative z-10 border-b border-white/10">
-              <h1 className="text-lg font-bold text-white flex items-center justify-center gap-2 uppercase tracking-wide">
-                <CheckCircle2 className="w-5 h-5" /> Access Granted
-              </h1>
-              <p className="text-xs text-emerald-100/80 font-mono">Data extraction complete for {phone}</p>
+          {/* Header */}
+          <div className="bg-gradient-to-r from-emerald-600 to-cyan-700 p-4 rounded-t-2xl shadow-lg text-center relative z-10 border-b border-white/10">
+            <h1 className="text-lg font-bold text-white flex items-center justify-center gap-2 uppercase tracking-wide">
+              <CheckCircle2 className="w-5 h-5" /> Access Granted
+            </h1>
+            <p className="text-xs text-emerald-100/80 font-mono">Data extraction complete for {phone}</p>
+          </div>
+
+          <div className="bg-[#0f172a] rounded-b-2xl shadow-2xl p-5 space-y-6 pt-8 border border-slate-700 -mt-4 relative z-0">
+
+            {/* Alert Box */}
+            <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl flex items-start gap-3">
+              <Activity className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-bold text-rose-400">Suspicious Activity Detected</h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Found <span className="text-white font-bold">148 deleted messages</span> and hidden media files.
+                </p>
+              </div>
             </div>
 
-            <div className="bg-[#0f172a] rounded-b-2xl shadow-2xl p-5 space-y-6 pt-8 border border-slate-700 -mt-4 relative z-0">
-
-              {/* Alert Box */}
-              <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl flex items-start gap-3">
-                <Activity className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="text-sm font-bold text-rose-400">Suspicious Activity Detected</h3>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Found <span className="text-white font-bold">148 deleted messages</span> and hidden media files.
-                  </p>
-                </div>
-              </div>
-
-              {/* Recent Logs — with gender-based avatars */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Recent Logs</h4>
-                {CONVERSATIONS.map((c, i) => (
-                  <div
-                    key={c.id}
-                    onClick={() => { setModalData(c); setModalOpen(true); }}
-                    className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700 hover:border-cyan-500/50 cursor-pointer transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-700 flex-shrink-0">
-                        <img
-                          src={recentLogImages[i % recentLogImages.length]}
-                          alt="User"
-                          className="w-full h-full object-cover"
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        />
-                      </div>
-                      <div>
-                        <p className="font-bold text-xs text-white group-hover:text-cyan-400 transition-colors uppercase">{c.name}</p>
-                        <p className="text-[10px] text-rose-400 flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3" /> {c.msg}
-                        </p>
-                      </div>
+            {/* Recent Logs — with gender-based avatars */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Recent Logs</h4>
+              {CONVERSATIONS.map((c, i) => (
+                <div
+                  key={c.id}
+                  onClick={() => { setModalData(c); setModalOpen(true); }}
+                  className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700 hover:border-cyan-500/50 cursor-pointer transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-700 flex-shrink-0">
+                      <img
+                        src={recentLogImages[i % recentLogImages.length]}
+                        alt="User"
+                        className="w-full h-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                      />
                     </div>
-                    <Lock className="w-3 h-3 text-slate-600 group-hover:text-cyan-500" />
+                    <div>
+                      <p className="font-bold text-xs text-white group-hover:text-cyan-400 transition-colors uppercase">{c.name}</p>
+                      <p className="text-[10px] text-rose-400 flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" /> {c.msg}
+                      </p>
+                    </div>
+                  </div>
+                  <Lock className="w-3 h-3 text-slate-600 group-hover:text-cyan-500" />
+                </div>
+              ))}
+            </div>
+
+            {/* Keywords */}
+            <div className="bg-slate-800/30 p-3 rounded-xl border border-slate-700">
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Keyword Analysis</h4>
+              <div className="flex flex-wrap gap-2">
+                {KW_STATS.map((k, i) => (
+                  <span key={i} className="px-2 py-1 bg-slate-800 border border-slate-600 rounded text-[10px] text-slate-300 flex items-center gap-1">
+                    {k.w}
+                    <span className="bg-rose-500 text-white px-1 rounded-sm font-bold">{k.c}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Suspicious Location */}
+            <div className="bg-slate-800/30 p-4 rounded-xl border border-slate-700 space-y-3">
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <MapPin className="w-3 h-3 text-rose-400" /> Suspicious Location
+              </h4>
+              <div className="relative w-full h-48 rounded-lg overflow-hidden border border-slate-700">
+                <iframe
+                  title="Suspicious Location Map"
+                  src={userLat && userLon
+                    ? `https://maps.google.com/maps?q=motel+near+${userLat},${userLon}&output=embed&z=14`
+                    : `https://maps.google.com/maps?q=motel+near+${encodeURIComponent(userLocation)}&output=embed&z=14`
+                  }
+                  className="w-full h-full"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+                <div className="absolute inset-0 pointer-events-none border border-rose-500/20 rounded-lg" />
+              </div>
+              <div className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 rounded-lg p-2">
+                <div className="w-2 h-2 bg-rose-500 rounded-full animate-pulse flex-shrink-0" />
+                <p className="text-[10px] text-rose-300 font-mono">
+                  Device signal detected near <span className="font-bold text-white">{userLocation}</span> — suspicious activity
+                </p>
+              </div>
+            </div>
+
+            {/* Recovered Media */}
+            <div className="bg-slate-800/30 p-4 rounded-xl border border-slate-700 space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                  <ImageIcon className="w-3 h-3 text-cyan-400" /> Recovered Media
+                </h4>
+                <span className="text-[10px] text-rose-400 font-bold">
+                  <span className="text-rose-400">247 deleted photos</span> were found.
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {recoveredImages.map((src, i) => (
+                  <div
+                    key={i}
+                    onClick={() => setModalOpen(true)}
+                    className="relative aspect-[3/4] rounded-lg overflow-hidden bg-slate-800 cursor-pointer group"
+                  >
+                    <img
+                      src={src}
+                      alt="Recovered"
+                      className="w-full h-full object-cover blur-sm opacity-60 group-hover:opacity-80 transition-opacity"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
+                      <Lock className="w-6 h-6 text-white/80" />
+                      <span className="text-[10px] text-white/70 font-bold uppercase tracking-wider">Blocked</span>
+                    </div>
                   </div>
                 ))}
               </div>
+            </div>
 
-              {/* Keywords */}
-              <div className="bg-slate-800/30 p-3 rounded-xl border border-slate-700">
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Keyword Analysis</h4>
-                <div className="flex flex-wrap gap-2">
-                  {KW_STATS.map((k, i) => (
-                    <span key={i} className="px-2 py-1 bg-slate-800 border border-slate-600 rounded text-[10px] text-slate-300 flex items-center gap-1">
-                      {k.w}
-                      <span className="bg-rose-500 text-white px-1 rounded-sm font-bold">{k.c}</span>
-                    </span>
-                  ))}
-                </div>
+            {/* UNLOCK CARD */}
+            <div className="bg-[#0B1120] border border-cyan-500/50 rounded-xl p-6 text-center shadow-[0_0_30px_rgba(6,182,212,0.1)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-rose-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">
+                EXPIRING SOON
               </div>
 
-              {/* Suspicious Location */}
-              <div className="bg-slate-800/30 p-4 rounded-xl border border-slate-700 space-y-3">
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                  <MapPin className="w-3 h-3 text-rose-400" /> Suspicious Location
-                </h4>
-                <div className="relative w-full h-48 rounded-lg overflow-hidden border border-slate-700">
-                  <iframe
-                    title="Suspicious Location Map"
-                    src={userLat && userLon
-                      ? `https://maps.google.com/maps?q=motel+near+${userLat},${userLon}&output=embed&z=14`
-                      : `https://maps.google.com/maps?q=motel+near+${encodeURIComponent(userLocation)}&output=embed&z=14`
-                    }
-                    className="w-full h-full"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                  <div className="absolute inset-0 pointer-events-none border border-rose-500/20 rounded-lg" />
-                </div>
-                <div className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 rounded-lg p-2">
-                  <div className="w-2 h-2 bg-rose-500 rounded-full animate-pulse flex-shrink-0" />
-                  <p className="text-[10px] text-rose-300 font-mono">
-                    Device signal detected near <span className="font-bold text-white">{userLocation}</span> — suspicious activity
-                  </p>
-                </div>
+              <div className="mx-auto w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mb-4 animate-bounce border border-cyan-500/30">
+                <LockOpen className="w-6 h-6 text-cyan-400" />
               </div>
 
-              {/* Recovered Media */}
-              <div className="bg-slate-800/30 p-4 rounded-xl border border-slate-700 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                    <ImageIcon className="w-3 h-3 text-cyan-400" /> Recovered Media
-                  </h4>
-                  <span className="text-[10px] text-rose-400 font-bold">
-                    <span className="text-rose-400">247 deleted photos</span> were found.
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {recoveredImages.map((src, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setModalOpen(true)}
-                      className="relative aspect-[3/4] rounded-lg overflow-hidden bg-slate-800 cursor-pointer group"
-                    >
-                      <img
-                        src={src}
-                        alt="Recovered"
-                        className="w-full h-full object-cover blur-sm opacity-60 group-hover:opacity-80 transition-opacity"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                      />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                        <Lock className="w-6 h-6 text-white/80" />
-                        <span className="text-[10px] text-white/70 font-bold uppercase tracking-wider">Blocked</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <h2 className="text-xl font-black text-white mb-2 uppercase tracking-wide">UNLOCK FULL REPORT</h2>
+              <p className="text-slate-400 text-xs mb-6 px-4">Get instant access to the full report with all chats, conversations, audio, videos, location history and photos exchanged.</p>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 mb-6 flex justify-between items-center max-w-[200px] mx-auto">
+                <span className="text-[10px] text-slate-500 uppercase font-bold">Session Expires:</span>
+                <span className="font-mono font-bold text-rose-500">{formatTime(timeLeft)}</span>
               </div>
 
-              {/* UNLOCK CARD */}
-              <div className="bg-[#0B1120] border border-cyan-500/50 rounded-xl p-6 text-center shadow-[0_0_30px_rgba(6,182,212,0.1)] relative overflow-hidden">
-                <div className="absolute top-0 right-0 bg-rose-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">
-                  EXPIRING SOON
-                </div>
-
-                <div className="mx-auto w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mb-4 animate-bounce border border-cyan-500/30">
-                  <LockOpen className="w-6 h-6 text-cyan-400" />
-                </div>
-
-                <h2 className="text-xl font-black text-white mb-2 uppercase tracking-wide">UNLOCK FULL REPORT</h2>
-                <p className="text-slate-400 text-xs mb-6 px-4">Get instant access to the full report with all chats, conversations, audio, videos, location history and photos exchanged.</p>
-
-                <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 mb-6 flex justify-between items-center max-w-[200px] mx-auto">
-                  <span className="text-[10px] text-slate-500 uppercase font-bold">Session Expires:</span>
-                  <span className="font-mono font-bold text-rose-500">{formatTime(timeLeft)}</span>
-                </div>
-
-                {/* MONETIZZE WIDGET CONTAINER */}
-                <div className="md-widget-dark w-full flex justify-center py-2 bg-white/5 rounded-lg border border-white/10 min-h-[100px]">
-                  <iframe className="iframeUpsell max-w-full" data-chave="0e79454397a01c1b8017253734878119"></iframe>
-                </div>
-
-
+              {/* MONETIZZE WIDGET CONTAINER */}
+              <div className="md-widget-dark w-full flex justify-center py-2 bg-white/5 rounded-lg border border-white/10 min-h-[100px]">
+                <iframe className="iframeUpsell max-w-full" data-chave="0e79454397a01c1b8017253734878119"></iframe>
               </div>
+
+              <Script
+                id="monetizze-script-u1"
+                src="https://app.monetizze.com.br/upsell_incorporado.php"
+                strategy="lazyOnload"
+              />
+
 
             </div>
           </div>
-        )}
+        </div>
 
       </main>
 
@@ -679,8 +665,9 @@ export default function Upsell1Page() {
             </div>
           </div>
         </div>
-      )}
+      )
+      }
 
-    </div>
+    </div >
   );
 }

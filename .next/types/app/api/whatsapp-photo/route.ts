@@ -1,4 +1,4 @@
-// File: C:\corleone_drm\tinder-zap-insta-ingles\app\api\whatsapp-photo\route.ts
+// File: C:\Users\madso\v1- tinder\app\api\whatsapp-photo\route.ts
 import * as entry from '../../../../../app/api/whatsapp-photo/route.js'
 import type { NextRequest } from 'next/server.js'
 

@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect, useRef } from 'react';
+import Script from 'next/script';
 
 import {
     Instagram, Search, Loader2, CheckCircle2, Heart, MessageCircle,
@@ -158,25 +159,6 @@ export default function Upsell2Page() {
         setTimeout(() => setLoadingText("Finalizing report..."), 7000);
     };
 
-    // Inject Monetizze script AFTER results step renders
-    useEffect(() => {
-        if (step !== 'results') return;
-
-        // Remove any previous script to force re-execution
-        const existing = document.getElementById('monetizze-u2-dynamic');
-        if (existing) existing.remove();
-
-        const timer = setTimeout(() => {
-            const script = document.createElement('script');
-            script.id = 'monetizze-u2-dynamic';
-            script.src = 'https://app.monetizze.com.br/upsell_incorporado.php';
-            script.type = 'text/javascript';
-            script.async = true;
-            document.head.appendChild(script);
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [step]);
 
     const cleanUsername = username.replace('@', '').trim();
 
@@ -401,232 +383,240 @@ export default function Upsell2Page() {
                 )}
 
                 {/* --- STEP 3: RESULTS --- */}
-                {step === 'results' && (() => {
+                <div className={step === 'results' ? 'block w-full' : 'hidden'}>
+                    {(() => {
 
-                    // â”€â”€ Username pools (opposite gender to create suspicion) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    // If user selected MALE â†’ show FEMALE names (women interacting with him)
-                    // If user selected FEMALE â†’ show MALE names (men interacting with her)
-                    const maleUsernames = [
-                        'carlos_08', 'juan.pablo', 'roberto_30', 'mart_be',
-                        'diego.rv', 'lucas_fit', 'andres_mx', 'felipe.ok',
-                    ];
-                    const femaleUsernames = [
-                        'sarah_fitness', 'laura.m', 'ana_bella', 'camila.rs',
-                        'julia_ok', 'sofia.vip', 'valentina_x', 'isabela.fit',
-                    ];
-                    // Opposite: male user â†’ female names; female user â†’ male names
-                    const namePool = gender === 'male' ? femaleUsernames : maleUsernames;
+                        // â”€â”€ Username pools (opposite gender to create suspicion) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                        // If user selected MALE â†’ show FEMALE names (women interacting with him)
+                        // If user selected FEMALE â†’ show MALE names (men interacting with her)
+                        const maleUsernames = [
+                            'carlos_08', 'juan.pablo', 'roberto_30', 'mart_be',
+                            'diego.rv', 'lucas_fit', 'andres_mx', 'felipe.ok',
+                        ];
+                        const femaleUsernames = [
+                            'sarah_fitness', 'laura.m', 'ana_bella', 'camila.rs',
+                            'julia_ok', 'sofia.vip', 'valentina_x', 'isabela.fit',
+                        ];
+                        // Opposite: male user â†’ female names; female user â†’ male names
+                        const namePool = gender === 'male' ? femaleUsernames : maleUsernames;
 
-                    // â”€â”€ Intercepted logs (4 cards, last 2 with scroll-to-unlock CTA) â”€â”€â”€â”€â”€
-                    const interceptedLogs = [
-                        {
-                            img: shuffledPerfil[0],
-                            name: namePool[0],
-                            action: 'liked your photo',
-                            time: '2m ago',
-                            icon: Heart,
-                            color: 'text-rose-500',
-                            badge: null,
-                            cta: false,
-                        },
-                        {
-                            img: shuffledPerfil[1],
-                            name: namePool[1],
-                            action: 'liked your photo',
-                            time: '12m ago',
-                            icon: Heart,
-                            color: 'text-red-500',
-                            badge: null,
-                            cta: false,
-                        },
-                        {
-                            img: shuffledPerfil[2],
-                            name: namePool[2],
-                            action: 'sent you a message',
-                            time: '18m ago',
-                            icon: MessageCircle,
-                            color: 'text-cyan-400',
-                            badge: null,
-                            cta: true,
-                        },
-                        {
-                            img: shuffledPerfil[3],
-                            name: namePool[3],
-                            action: 'sent you a message',
-                            time: '1h ago',
-                            icon: MessageCircle,
-                            color: 'text-rose-500',
-                            badge: null,
-                            cta: true,
-                        },
-                    ];
+                        // â”€â”€ Intercepted logs (4 cards, last 2 with scroll-to-unlock CTA) â”€â”€â”€â”€â”€
+                        const interceptedLogs = [
+                            {
+                                img: shuffledPerfil[0],
+                                name: namePool[0],
+                                action: 'liked your photo',
+                                time: '2m ago',
+                                icon: Heart,
+                                color: 'text-rose-500',
+                                badge: null,
+                                cta: false,
+                            },
+                            {
+                                img: shuffledPerfil[1],
+                                name: namePool[1],
+                                action: 'liked your photo',
+                                time: '12m ago',
+                                icon: Heart,
+                                color: 'text-red-500',
+                                badge: null,
+                                cta: false,
+                            },
+                            {
+                                img: shuffledPerfil[2],
+                                name: namePool[2],
+                                action: 'sent you a message',
+                                time: '18m ago',
+                                icon: MessageCircle,
+                                color: 'text-cyan-400',
+                                badge: null,
+                                cta: true,
+                            },
+                            {
+                                img: shuffledPerfil[3],
+                                name: namePool[3],
+                                action: 'sent you a message',
+                                time: '1h ago',
+                                icon: MessageCircle,
+                                color: 'text-rose-500',
+                                badge: null,
+                                cta: true,
+                            },
+                        ];
 
-                    const scrollToUnlock = () => {
-                        document.getElementById('unlock-widget')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    };
+                        const scrollToUnlock = () => {
+                            document.getElementById('unlock-widget')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        };
 
-                    return (
-                        <div className="animate-in slide-in-from-bottom-8 space-y-4 pt-2">
+                        return (
+                            <div className="animate-in slide-in-from-bottom-8 space-y-4 pt-2">
 
-                            {/* Analysis Complete banner */}
-                            <div className="flex items-center justify-center gap-2 py-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-                                <CheckCircle2 className="text-emerald-500 w-4 h-4" />
-                                <span className="text-emerald-400 font-bold text-xs uppercase tracking-widest">Analysis Complete</span>
-                            </div>
-
-                            {/* Instagram Profile Card */}
-                            <div className="bg-[#0f172a] rounded-xl border border-emerald-500/30 p-4 shadow-lg">
-                                <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-3 flex items-center gap-1">
-                                    <CheckCircle2 className="w-3 h-3" /> Instagram Profile Detected
-                                </div>
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-800 flex-shrink-0 border-2 border-emerald-500/40">
-                                        {profile?.profile_pic_url ? (
-                                            <img src={profile.profile_pic_url} alt={cleanUsername} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                                        ) : (
-                                            <User className="w-6 h-6 text-slate-500 m-auto mt-4" />
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-bold text-white text-base">@{cleanUsername}</p>
-                                        {profile?.full_name && <p className="text-xs text-slate-400">{profile.full_name}</p>}
-                                    </div>
+                                {/* Analysis Complete banner */}
+                                <div className="flex items-center justify-center gap-2 py-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                                    <CheckCircle2 className="text-emerald-500 w-4 h-4" />
+                                    <span className="text-emerald-400 font-bold text-xs uppercase tracking-widest">Analysis Complete</span>
                                 </div>
 
-                                {/* Stats row */}
-                                <div className="grid grid-cols-3 gap-2 text-center mb-3">
-                                    <div className="bg-slate-800/60 rounded-lg py-2">
-                                        <p className="text-white font-bold text-sm">{profile?.media_count ?? 'â€”'}</p>
-                                        <p className="text-slate-500 text-[10px]">Posts</p>
+                                {/* Instagram Profile Card */}
+                                <div className="bg-[#0f172a] rounded-xl border border-emerald-500/30 p-4 shadow-lg">
+                                    <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-3 flex items-center gap-1">
+                                        <CheckCircle2 className="w-3 h-3" /> Instagram Profile Detected
                                     </div>
-                                    <div className="bg-slate-800/60 rounded-lg py-2">
-                                        <p className="text-white font-bold text-sm">
-                                            {profile?.follower_count ? (profile.follower_count >= 1000 ? `${(profile.follower_count / 1000).toFixed(1)}k` : profile.follower_count) : 'â€”'}
-                                        </p>
-                                        <p className="text-slate-500 text-[10px]">Followers</p>
-                                    </div>
-                                    <div className="bg-slate-800/60 rounded-lg py-2">
-                                        <p className="text-white font-bold text-sm">
-                                            {profile?.following_count ? (profile.following_count >= 1000 ? `${(profile.following_count / 1000).toFixed(1)}k` : profile.following_count) : 'â€”'}
-                                        </p>
-                                        <p className="text-slate-500 text-[10px]">Following</p>
-                                    </div>
-                                </div>
-
-                                <div className="text-[11px] text-slate-400 italic border-t border-slate-700/50 pt-2">
-                                    {profile?.biography
-                                        ? profile.biography
-                                        : profile?.is_private
-                                            ? '🔒 Private account — bio hidden'
-                                            : '📍 Bio and last 4 locations extracted'
-                                    }
-                                </div>
-                            </div>
-
-                            {/* System Log Card */}
-                            <div className="bg-[#0f172a] rounded-xl border border-slate-700/50 p-3 font-mono text-[10px]">
-                                <p className="text-slate-500 mb-2 uppercase tracking-widest text-[9px]">[SYSTEM_LOG] New activity detected</p>
-                                <div className="space-y-1">
-                                    <div className="flex gap-1 flex-wrap">
-                                        <span className="bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded">@{cleanUsername}</span>
-                                        <span className="bg-rose-900/50 text-rose-300 px-1.5 py-0.5 rounded">@{namePool[4] ?? namePool[0]}</span>
-                                        <span className="text-slate-400">liked your photo.</span>
-                                    </div>
-                                    <div className="flex gap-1 flex-wrap">
-                                        <span className="bg-cyan-900/50 text-cyan-300 px-1.5 py-0.5 rounded">@{cleanUsername}</span>
-                                        <span className="text-slate-400">new message from</span>
-                                        <span className="bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded">@{namePool[5] ?? namePool[1]}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Intercepted Logs — 4 cards */}
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest">Intercepted Logs</h3>
-                                    <span className="bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded animate-pulse">LIVE</span>
-                                </div>
-
-                                {interceptedLogs.map((it, i) => (
-                                    <div
-                                        key={i}
-                                        onClick={it.cta ? scrollToUnlock : undefined}
-                                        className={`bg-[#0f172a] border border-slate-700/50 rounded-lg p-3 flex items-center gap-3 transition-colors ${it.cta ? 'cursor-pointer hover:border-rose-500/60 active:scale-[0.99]' : 'hover:border-rose-500/30'}`}
-                                    >
-                                        <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-800 flex-shrink-0">
-                                            <img src={it.img} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-start">
-                                                <p className="text-xs font-bold text-slate-300">@{it.name}</p>
-                                                <p className="text-[9px] text-slate-500 ml-2 flex-shrink-0">{it.time}</p>
-                                            </div>
-                                            <p className="text-[10px] text-slate-400 truncate">{it.action}</p>
-                                            {it.cta && (
-                                                <p className="text-[10px] text-rose-400 font-bold mt-0.5 animate-pulse">Click to read history...</p>
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-800 flex-shrink-0 border-2 border-emerald-500/40">
+                                            {profile?.profile_pic_url ? (
+                                                <img src={profile.profile_pic_url} alt={cleanUsername} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                            ) : (
+                                                <User className="w-6 h-6 text-slate-500 m-auto mt-4" />
                                             )}
                                         </div>
-                                        {it.cta ? (
-                                            <span className="text-[9px] bg-rose-500 text-white px-1.5 py-0.5 rounded font-bold flex-shrink-0">READ</span>
-                                        ) : (
-                                            <it.icon className={`w-3.5 h-3.5 ${it.color} flex-shrink-0`} />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* INTERCEPTED: Suspicious Likes */}
-                            <div className="space-y-3 pt-2">
-                                <h3 className="font-bold text-rose-500 text-sm uppercase tracking-wide">
-                                    INTERCEPTED: Suspicious Likes from {cleanUsername}
-                                </h3>
-
-                                {shuffledLiked.map((imgSrc, i) => (
-                                    <div key={i} className="relative rounded-xl overflow-hidden border border-slate-700/50">
-                                        <img
-                                            src={imgSrc}
-                                            alt=""
-                                            className="w-full object-cover"
-                                            style={{ filter: 'blur(12px)', transform: 'scale(1.05)' }}
-                                        />
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                            <Lock className="w-8 h-8 text-white/80" />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-bold text-white text-base">@{cleanUsername}</p>
+                                            {profile?.full_name && <p className="text-xs text-slate-400">{profile.full_name}</p>}
                                         </div>
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-3 py-2 flex items-center gap-2">
-                                            <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-700 flex-shrink-0 border border-white/20">
-                                                {profile?.profile_pic_url ? (
-                                                    <img src={profile.profile_pic_url} alt={cleanUsername} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                                                ) : (
-                                                    <div className="w-full h-full bg-slate-600" />
+                                    </div>
+
+                                    {/* Stats row */}
+                                    <div className="grid grid-cols-3 gap-2 text-center mb-3">
+                                        <div className="bg-slate-800/60 rounded-lg py-2">
+                                            <p className="text-white font-bold text-sm">{profile?.media_count ?? 'â€”'}</p>
+                                            <p className="text-slate-500 text-[10px]">Posts</p>
+                                        </div>
+                                        <div className="bg-slate-800/60 rounded-lg py-2">
+                                            <p className="text-white font-bold text-sm">
+                                                {profile?.follower_count ? (profile.follower_count >= 1000 ? `${(profile.follower_count / 1000).toFixed(1)}k` : profile.follower_count) : 'â€”'}
+                                            </p>
+                                            <p className="text-slate-500 text-[10px]">Followers</p>
+                                        </div>
+                                        <div className="bg-slate-800/60 rounded-lg py-2">
+                                            <p className="text-white font-bold text-sm">
+                                                {profile?.following_count ? (profile.following_count >= 1000 ? `${(profile.following_count / 1000).toFixed(1)}k` : profile.following_count) : 'â€”'}
+                                            </p>
+                                            <p className="text-slate-500 text-[10px]">Following</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="text-[11px] text-slate-400 italic border-t border-slate-700/50 pt-2">
+                                        {profile?.biography
+                                            ? profile.biography
+                                            : profile?.is_private
+                                                ? '🔒 Private account — bio hidden'
+                                                : '📍 Bio and last 4 locations extracted'
+                                        }
+                                    </div>
+                                </div>
+
+                                {/* System Log Card */}
+                                <div className="bg-[#0f172a] rounded-xl border border-slate-700/50 p-3 font-mono text-[10px]">
+                                    <p className="text-slate-500 mb-2 uppercase tracking-widest text-[9px]">[SYSTEM_LOG] New activity detected</p>
+                                    <div className="space-y-1">
+                                        <div className="flex gap-1 flex-wrap">
+                                            <span className="bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded">@{cleanUsername}</span>
+                                            <span className="bg-rose-900/50 text-rose-300 px-1.5 py-0.5 rounded">@{namePool[4] ?? namePool[0]}</span>
+                                            <span className="text-slate-400">liked your photo.</span>
+                                        </div>
+                                        <div className="flex gap-1 flex-wrap">
+                                            <span className="bg-cyan-900/50 text-cyan-300 px-1.5 py-0.5 rounded">@{cleanUsername}</span>
+                                            <span className="text-slate-400">new message from</span>
+                                            <span className="bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded">@{namePool[5] ?? namePool[1]}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Intercepted Logs — 4 cards */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest">Intercepted Logs</h3>
+                                        <span className="bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded animate-pulse">LIVE</span>
+                                    </div>
+
+                                    {interceptedLogs.map((it, i) => (
+                                        <div
+                                            key={i}
+                                            onClick={it.cta ? scrollToUnlock : undefined}
+                                            className={`bg-[#0f172a] border border-slate-700/50 rounded-lg p-3 flex items-center gap-3 transition-colors ${it.cta ? 'cursor-pointer hover:border-rose-500/60 active:scale-[0.99]' : 'hover:border-rose-500/30'}`}
+                                        >
+                                            <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-800 flex-shrink-0">
+                                                <img src={it.img} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-start">
+                                                    <p className="text-xs font-bold text-slate-300">@{it.name}</p>
+                                                    <p className="text-[9px] text-slate-500 ml-2 flex-shrink-0">{it.time}</p>
+                                                </div>
+                                                <p className="text-[10px] text-slate-400 truncate">{it.action}</p>
+                                                {it.cta && (
+                                                    <p className="text-[10px] text-rose-400 font-bold mt-0.5 animate-pulse">Click to read history...</p>
                                                 )}
                                             </div>
-                                            <span className="text-white text-[10px] font-bold">@{cleanUsername}</span>
-                                            <span className="text-slate-300 text-[10px] ml-1">
-                                                {['Wow, you look great 🔥', '❤️ ❤️', 'So beautiful 😍', 'You drive me crazy 😈'][i % 4]}
-                                            </span>
+                                            {it.cta ? (
+                                                <span className="text-[9px] bg-rose-500 text-white px-1.5 py-0.5 rounded font-bold flex-shrink-0">READ</span>
+                                            ) : (
+                                                <it.icon className={`w-3.5 h-3.5 ${it.color} flex-shrink-0`} />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* INTERCEPTED: Suspicious Likes */}
+                                <div className="space-y-3 pt-2">
+                                    <h3 className="font-bold text-rose-500 text-sm uppercase tracking-wide">
+                                        INTERCEPTED: Suspicious Likes from {cleanUsername}
+                                    </h3>
+
+                                    {shuffledLiked.map((imgSrc, i) => (
+                                        <div key={i} className="relative rounded-xl overflow-hidden border border-slate-700/50">
+                                            <img
+                                                src={imgSrc}
+                                                alt=""
+                                                className="w-full object-cover"
+                                                style={{ filter: 'blur(12px)', transform: 'scale(1.05)' }}
+                                            />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                                <Lock className="w-8 h-8 text-white/80" />
+                                            </div>
+                                            <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-3 py-2 flex items-center gap-2">
+                                                <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-700 flex-shrink-0 border border-white/20">
+                                                    {profile?.profile_pic_url ? (
+                                                        <img src={profile.profile_pic_url} alt={cleanUsername} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-slate-600" />
+                                                    )}
+                                                </div>
+                                                <span className="text-white text-[10px] font-bold">@{cleanUsername}</span>
+                                                <span className="text-slate-300 text-[10px] ml-1">
+                                                    {['Wow, you look great 🔥', '❤️ ❤️', 'So beautiful 😍', 'You drive me crazy 😈'][i % 4]}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Unlock Widget */}
+                                <div id="unlock-widget" className="text-center bg-[#0B1120] border border-rose-500/50 shadow-[0_0_30px_rgba(244,63,94,0.15)] rounded-2xl p-6 relative overflow-hidden mt-2">
+                                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500" />
+                                    <div className="mb-4 flex justify-center">
+                                        <div className="bg-rose-500/10 p-3 rounded-full border border-rose-500/30 animate-pulse">
+                                            <Lock className="w-6 h-6 text-rose-500" />
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-
-                            {/* Unlock Widget */}
-                            <div id="unlock-widget" className="text-center bg-[#0B1120] border border-rose-500/50 shadow-[0_0_30px_rgba(244,63,94,0.15)] rounded-2xl p-6 relative overflow-hidden mt-2">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500" />
-                                <div className="mb-4 flex justify-center">
-                                    <div className="bg-rose-500/10 p-3 rounded-full border border-rose-500/30 animate-pulse">
-                                        <Lock className="w-6 h-6 text-rose-500" />
+                                    <h2 className="text-lg font-black text-white mb-2 uppercase tracking-wide">UNLOCK FULL REPORT</h2>
+                                    <p className="text-xs text-slate-400 mb-6 px-4">Instant access. 100% Anonymous.</p>
+                                    <div className="w-full flex justify-center min-h-[100px] bg-white/5 rounded-lg border border-white/10 py-2">
+                                        <iframe className="iframeUpsell max-w-full" data-chave="84c1a0e8482b7b694394faa7c2a145af"></iframe>
                                     </div>
-                                </div>
-                                <h2 className="text-lg font-black text-white mb-2 uppercase tracking-wide">UNLOCK FULL REPORT</h2>
-                                <p className="text-xs text-slate-400 mb-6 px-4">Instant access. 100% Anonymous.</p>
-                                <div className="w-full flex justify-center min-h-[100px] bg-white/5 rounded-lg border border-white/10 py-2">
-                                    <iframe className="iframeUpsell max-w-full" data-chave="84c1a0e8482b7b694394faa7c2a145af"></iframe>
-                                </div>
-                            </div>
 
-                        </div>
-                    );
-                })()}
+                                    <Script
+                                        id="monetizze-script-u2"
+                                        src="https://app.monetizze.com.br/upsell_incorporado.php"
+                                        strategy="lazyOnload"
+                                    />
+                                </div>
+
+                            </div>
+                        );
+                    })()}
+                </div>
 
             </div>
         </div>

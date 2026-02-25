@@ -81,3 +81,32 @@ O script garante que, mesmo com carregamentos dinâmicos e cliques internos, o R
 *   **Botão "UNLOCK REPORT NOW" no Step-2 (Visualização do Resultado)**: Link para `https://rt.tinderchecks.store/click`
 *   **Checkout**: Cadastrado apenas na aba **Offers** do RedTrack.
 *   **Universal Tracking Script**: Instalar no `<head>` de `https://tindercheck.store/` e `https://tindercheck.store/step-2`.
+
+## 5. Configuração de Postback (S2S) - Monetizze e Mundpay
+
+Para que o RedTrack registre as vendas (conversões) que ocorrem na Monetizze ou Mundpay, você precisa configurar o Postback URL (Webhooks) na plataforma de pagamento.
+
+### Como funciona no RedTrack
+1. Quando o usuário clica no botão "UNLOCK REPORT NOW" (Link de Click do RedTrack), ele é redirecionado para o seu Checkout (Offer).
+2. O RedTrack gera um ID único para esse clique (`clickid`) e anexa à URL do checkout.
+3. A Monetizze/Mundpay armazena esse ID.
+4. Quando a venda é concluída, a plataforma dispara um aviso (Postback/Webhook) de volta para o RedTrack avisando: "O click ID X gerou uma venda de Y valor".
+
+### Configuração na Monetizze
+Pela imagem e documentação da Monetizze, os macros (variáveis) corretos são `{chave_unica}` para o click ID e `{valor}` para o valor da venda.
+
+1. Faça login na [Monetizze](https://app.monetizze.com.br/).
+2. No menu superior, vá em **Ferramentas > Postback**.
+3. Adicione uma nova configuração de Postback:
+   - **Tipo:** Server to Server (S2S)
+   - **Formato:** x-www-form-urlencoded (ou Get/JSON se preferir)
+   - **Eventos:** Selecione "Venda Finalizada" (ou Venda Aprovada / PIX Gerado, de acordo com o que quer rastrear no RedTrack).
+   - **URL de Postback:** 
+     Cole a URL gerada pelo seu RedTrack (exemplo):
+     `https://rt.tinderchecks.store/postback?clickid={chave_unica}&sum={valor}`
+4. Salve e, se possível, clique em "Testar" para garantir que o RedTrack recebe a notificação.
+
+### Importante sobre a Oferta (RedTrack)
+No RedTrack (na sua configuração de "Offer" ou "Offer Source"):
+- Certifique-se de que a **Offer URL** esteja passando o parâmetro `{clickid}` para a Monetizze. A URL da sua oferta no RedTrack geralmente se parece com: `https://app.monetizze.com.br/checkout/CODIGODA SUA_OFERTA?src={clickid}`. Dessa forma, o `{clickid}` entra no campo principal de rastreio da Monetizze e é devolvido no Postback sob o macro `{chave_unica}` ou `src`.
+*(Se você configurou um sub-parâmetro diferente no Checkout, ajuste a URL de postback para usar o macro correspondente do painel da Monetizze).*

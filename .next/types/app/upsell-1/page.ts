@@ -1,4 +1,4 @@
-// File: C:\corleone_drm\tinder-zap-insta-ingles\app\upsell-1\page.tsx
+// File: C:\Users\madso\v1- tinder\app\upsell-1\page.tsx
 import * as entry from '../../../../app/upsell-1/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
