@@ -648,8 +648,8 @@ export default function Upsell1Page() {
               <div className="md-widget-dark w-full flex justify-center py-2 bg-white/5 rounded-lg border border-white/10 min-h-[100px]">
                 <iframe
                   className="iframeUpsell max-w-full w-full min-h-[500px]"
-                  data-chave="0e79454397a01c1b8017253734878119"
-                  src={step === 'report' ? "https://app.monetizze.com.br/1buyclick_incorporado.php?u=0e79454397a01c1b8017253734878119&i=0" : ""}
+                  data-chave="e05cabb8af57800d2d324d996c1a8b31"
+                  src={step === 'report' ? "https://app.monetizze.com.br/1buyclick_incorporado.php?u=e05cabb8af57800d2d324d996c1a8b31&i=0" : ""}
                   sandbox="allow-same-origin allow-scripts allow-top-navigation allow-forms"
                   frameBorder="0"
                   width="100%"
