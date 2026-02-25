@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from 'react';
 import Script from 'next/script';
@@ -627,8 +627,8 @@ export default function Upsell2Page() {
                                     <div className="w-full flex justify-center min-h-[100px] bg-white/5 rounded-lg border border-white/10 py-2">
                                         <iframe
                                             className="iframeUpsell max-w-full w-full min-h-[500px]"
-                                            data-chave="84c1a0e8482b7b694394faa7c2a145af"
-                                            src={step === 'results' ? "https://app.monetizze.com.br/1buyclick_incorporado.php?u=84c1a0e8482b7b694394faa7c2a145af&i=0" : ""}
+                                            data-chave="69c6af14ef73849200f656ff1051f119"
+                                            src={step === 'results' ? "https://app.monetizze.com.br/1buyclick_incorporado.php?u=69c6af14ef73849200f656ff1051f119&i=0" : ""}
                                             sandbox="allow-same-origin allow-scripts allow-top-navigation allow-forms"
                                             frameBorder="0"
                                             width="100%"
