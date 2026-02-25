@@ -29,6 +29,26 @@ export default function Downsell1Page() {
         }
     }, [timeLeft]);
 
+    // Handle Monetizze iframe postMessage for height and redirects
+    useEffect(() => {
+        const handleMessage = (e: MessageEvent) => {
+            if (!Array.isArray(e.data)) return;
+            const [event, ...params] = e.data;
+            if (event === 'setHeightIframeUpsell') {
+                const [index, height] = params;
+                const iframes = document.getElementsByClassName('iframeUpsell');
+                if (iframes[index]) {
+                    (iframes[index] as HTMLIFrameElement).height = height + "px";
+                }
+            } else if (event === 'redirect') {
+                const [url] = params;
+                if (window.top) window.top.location.href = url;
+            }
+        };
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, []);
+
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
@@ -147,14 +167,17 @@ export default function Downsell1Page() {
 
                         {/* MONETIZZE WIDGET */}
                         <div className="w-full bg-white/5 rounded-lg border border-white/10 flex justify-center py-2 min-h-[100px]">
-                            <iframe className="iframeUpsell max-w-full" data-chave="0cfefbf460eb0766785251c1915a3c45"></iframe>
+                            <iframe
+                                className="iframeUpsell max-w-full"
+                                data-chave="0cfefbf460eb0766785251c1915a3c45"
+                                src="https://app.monetizze.com.br/1buyclick_incorporado.php?u=0cfefbf460eb0766785251c1915a3c45&i=0"
+                                sandbox="allow-same-origin allow-scripts allow-top-navigation allow-forms"
+                                frameBorder="0"
+                                width="100%"
+                                height="400px"
+                                title="Monetizze Checkout"
+                            ></iframe>
                         </div>
-
-                        <Script
-                            id="monetizze-script-d1"
-                            src="https://app.monetizze.com.br/upsell_incorporado.php"
-                            strategy="lazyOnload"
-                        />
 
                     </div>
                 </div>

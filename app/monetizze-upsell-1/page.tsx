@@ -246,6 +246,26 @@ export default function Upsell1Page() {
     }, 1200);
   };
 
+  // Handle Monetizze iframe postMessage for height and redirects
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (!Array.isArray(e.data)) return;
+      const [event, ...params] = e.data;
+      if (event === 'setHeightIframeUpsell') {
+        const [index, height] = params;
+        const iframes = document.getElementsByClassName('iframeUpsell');
+        if (iframes[index]) {
+          (iframes[index] as HTMLIFrameElement).height = height + "px";
+        }
+      } else if (event === 'redirect') {
+        const [url] = params;
+        if (window.top) window.top.location.href = url;
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   useEffect(() => {
     if (step === 'report' && timeLeft > 0) {
       const timer = setInterval(() => setTimeLeft(t => t - 1), 1000);
@@ -624,14 +644,17 @@ export default function Upsell1Page() {
 
               {/* MONETIZZE WIDGET CONTAINER */}
               <div className="md-widget-dark w-full flex justify-center py-2 bg-white/5 rounded-lg border border-white/10 min-h-[100px]">
-                <iframe className="iframeUpsell max-w-full" data-chave="0e79454397a01c1b8017253734878119"></iframe>
+                <iframe
+                  className="iframeUpsell max-w-full"
+                  data-chave="0e79454397a01c1b8017253734878119"
+                  src="https://app.monetizze.com.br/1buyclick_incorporado.php?u=0e79454397a01c1b8017253734878119&i=0"
+                  sandbox="allow-same-origin allow-scripts allow-top-navigation allow-forms"
+                  frameBorder="0"
+                  width="100%"
+                  height="400px"
+                  title="Monetizze Checkout"
+                ></iframe>
               </div>
-
-              <Script
-                id="monetizze-script-u1"
-                src="https://app.monetizze.com.br/upsell_incorporado.php"
-                strategy="lazyOnload"
-              />
 
 
             </div>
