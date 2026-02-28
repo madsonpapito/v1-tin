@@ -11,6 +11,10 @@ export default function HomeWireframeMatch() {
   const router = useRouter();
 
   const handleStart = () => {
+    // Dispara o Pixel Alert (Initiate Checkout) antes de mandar pro funil de conversão
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'InitiateCheckout');
+    }
     window.location.href = 'https://rt.tinderchecks.store/preclick';
   };
 
