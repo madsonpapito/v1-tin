@@ -42,31 +42,38 @@ export default function HomeWireframeMatch() {
               Live Database Access
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-[1.1] tracking-tight">
-              YOU&apos;RE NOT PARANOID — <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">YOU&apos;RE INVESTIGATING</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight">
+              THE MOMENT EVERYTHING <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">MAKES SENSE.</span>
             </h1>
 
-            <p className="text-slate-400 text-lg leading-relaxed max-w-md">
-              That gut feeling? It exists for a reason. Every minute you wait is another minute of doubt eating away at your peace.
-            </p>
+            <div className="bg-slate-800/50 border-l-4 border-emerald-500 p-4 rounded-r-lg max-w-lg shadow-lg">
+              <p className="text-slate-300 text-md leading-relaxed font-medium">
+                <strong className="text-emerald-400">Gaslighting is real.</strong> They will tell you that you're crazy, paranoid, or insecure. But that gut feeling exists for a reason. <b className="text-white">Data doesn't lie.</b>
+              </p>
+            </div>
 
-            <ul className="space-y-2 text-sm text-slate-300">
-              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Scan their digital footprint.</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Find hidden dating profiles.</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Get the truth in under 2 minutes.</li>
+            <ul className="space-y-3 text-sm text-slate-300 font-semibold">
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" /> Find hidden Tinder & Bumble profiles.</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" /> Track invisible digital footprints.</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" /> 100% Anonymous. They will never know.</li>
             </ul>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <div className="flex flex-col gap-4 pt-4">
               <button
                 onClick={handleStart}
-                className="bg-emerald-500 hover:bg-emerald-400 text-[#060b19] font-bold py-4 px-8 rounded-lg shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:scale-105 flex items-center justify-center gap-2 text-lg"
+                className="group relative bg-emerald-500 hover:bg-emerald-400 text-[#060b19] font-black py-5 px-8 rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all transform hover:scale-[1.02] flex items-center justify-center gap-3 text-xl overflow-hidden"
               >
-                Start Free Scan (1 Credit)
+                <div className="absolute inset-0 w-full h-full bg-white/30 blur-md transform -translate-x-[150%] skew-x-12 group-hover:translate-x-[150%] transition-transform duration-700"></div>
+                <Search className="w-6 h-6" />
+                START DEEP SCAN NOW
               </button>
-              <p className="text-xs text-slate-500 mt-2 sm:hidden text-center">No credit card required for scan.</p>
+
+              <div className="flex items-center justify-center gap-2 bg-emerald-500/10 border border-emerald-500/20 py-2.5 px-4 rounded-lg">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]"></span>
+                <span className="text-emerald-400 text-sm font-bold tracking-wide">System Online: 1 Free Credit Applied</span>
+              </div>
             </div>
-            <p className="text-xs text-slate-500 italic">100% anonymous. They&apos;ll never know you checked.</p>
           </div>
 
           {/* Hero Image / Graphic */}
@@ -114,17 +121,18 @@ export default function HomeWireframeMatch() {
         </div>
       </section>
 
-      {/* TRUST BAR */}
-      <div className="bg-[#0f172a]/50 border-y border-slate-800/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-6 flex flex-wrap justify-center gap-8 md:gap-16 text-slate-400 text-sm font-medium">
-          <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-emerald-500" /> SSL Secure
+      {/* TRUST BAR - HIGH CONVERTING */}
+      <div className="bg-[#0f172a] border-y border-emerald-500/20 backdrop-blur-sm relative overflow-hidden">
+        <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.05),transparent_50%)]"></div>
+        <div className="container mx-auto px-4 py-5 flex flex-wrap justify-center gap-6 md:gap-16 text-slate-300 text-sm font-bold relative z-10">
+          <div className="flex items-center gap-2 drop-shadow-md">
+            <ShieldCheck className="w-5 h-5 text-emerald-500" /> 100% ANONYMOUS
           </div>
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" /> 100% Anonymous
+          <div className="flex items-center gap-2 drop-shadow-md">
+            <Search className="w-5 h-5 text-emerald-500" /> 2-MINUTE FAST SCAN
           </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Verified Report
+          <div className="flex items-center gap-2 drop-shadow-md">
+            <CheckCircle2 className="w-5 h-5 text-emerald-500" /> 98.4% ACCURACY RATE
           </div>
         </div>
       </div>
@@ -133,9 +141,9 @@ export default function HomeWireframeMatch() {
       <section className="py-24 bg-[#060b19]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4 text-white">The Signs You Know Too Well</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              Trusting your gut isn&apos;t paranoia — it&apos;s survival instinct. If you&apos;re reading this, something already feels wrong. You deserve clarity.
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-white uppercase tracking-tight">DON&apos;T LET THIS BE YOU</h2>
+            <p className="text-slate-300 text-lg max-w-2xl mx-auto font-medium">
+              Are you being cheated on via social media? If you&apos;re reading this, something already feels wrong. Don&apos;t wait for them to confess. <strong className="text-emerald-400">Discover the truth today.</strong>
             </p>
           </div>
 
