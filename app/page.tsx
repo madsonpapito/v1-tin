@@ -11,9 +11,21 @@ export default function HomeWireframeMatch() {
   const router = useRouter();
 
   const handleStart = () => {
-    // Dispara o Pixel Alert (Initiate Checkout) antes de mandar pro funil de conversão
+    // Dispara o Pixel da Meta (Initiate Checkout)
     if (typeof window !== 'undefined' && (window as any).fbq) {
       (window as any).fbq('track', 'InitiateCheckout');
+    }
+    // Dispara o Evento para o GTM / Google Analytics 4 (DataLayer Push)
+    if (typeof window !== 'undefined') {
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      (window as any).dataLayer.push({
+        event: 'initiate_checkout',
+        ecommerce: {
+          currency: 'EUR',
+          value: 37.00,
+          items: [{ item_name: 'TinderCheck Core Scan', price: 37.00, quantity: 1 }]
+        }
+      });
     }
     window.location.href = 'https://rt.tinderchecks.store/preclick';
   };
