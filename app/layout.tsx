@@ -24,7 +24,7 @@ export default function RootLayout({
             var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='rtkData'?'&l='+l:'';
             j.async=true;j.src='https://rt.tinderchecks.store/track.js?rtkcmpid='+i+dl;
             f.parentNode.insertBefore(j,f);
-            })(window,document,'script','rtkData','699b8f53a801952e7ab0d623');
+            })(window,document,'script','rtkData','69a895a4a80b99a6244cbf7b');
           `}
         </Script>
         {/* Meta Pixel Code */}
