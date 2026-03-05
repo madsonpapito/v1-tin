@@ -1,32 +1,20 @@
 "use client"
 
-import {
-  Search, ShieldCheck, Lock, Smartphone, Moon, Clock, HeartCrack,
-  CheckCircle2, Star, MapPin, ChevronRight, Menu
-} from 'lucide-react'
+import { Search, ShieldCheck, Lock, Smartphone, Moon, Clock, HeartCrack, CheckCircle2, Star, MapPin, ChevronRight, Menu } from 'lucide-react'
 import Image from "next/image"
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function HomeWireframeMatch() {
   const router = useRouter();
 
-  const handleStart = () => {
-    // Dispara o Pixel da Meta (Initiate Checkout)
+  useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('track', 'InitiateCheckout');
+      (window as any).fbq('track', 'ViewContent');
     }
-    // Dispara o Evento para o GTM / Google Analytics 4 (DataLayer Push)
-    if (typeof window !== 'undefined') {
-      (window as any).dataLayer = (window as any).dataLayer || [];
-      (window as any).dataLayer.push({
-        event: 'initiate_checkout',
-        ecommerce: {
-          currency: 'EUR',
-          value: 37.00,
-          items: [{ item_name: 'TinderCheck Core Scan', price: 37.00, quantity: 1 }]
-        }
-      });
-    }
+  }, []);
+
+  const handleStart = () => {
     window.location.href = 'https://rt.tinderchecks.store/preclick';
   };
 

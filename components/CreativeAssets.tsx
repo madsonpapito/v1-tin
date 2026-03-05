@@ -103,8 +103,8 @@ export const CreativeAssets = () => {
                 </div>
 
                 <div className="absolute bottom-4 left-4 bg-slate-900/90 p-2 rounded border border-slate-700 text-xs font-mono text-green-400">
-             > GPS Signal: STRONG <br />
-             > Triangulation: COMPLETE
+                    {'>'} GPS Signal: STRONG <br />
+                    {'>'} Triangulation: COMPLETE
                 </div>
             </div>
 

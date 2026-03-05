@@ -82,6 +82,17 @@ function DatingScannerContent() {
   }, [])
 
   useEffect(() => {
+    if (step === 3) {
+      // Meta Pixel Tracking - Results View is effectively AddToCart before final checkout
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'AddToCart', {
+          value: 37.00,
+          currency: 'EUR',
+          content_name: 'TinderCheck Deep Scan Result'
+        });
+      }
+    }
+
     // Generate matches when component mounts or step changes to 3 (Results)
     // Matches should be opposite gender of the target (suspect)
     if (step === 3 && selectedGender) {
@@ -138,6 +149,11 @@ function DatingScannerContent() {
 
   const startInvestigation = () => {
     setStep(2)
+
+    // Meta Pixel Tracking
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Lead');
+    }
 
     // RedTrack Tracking
     try {
@@ -914,6 +930,15 @@ function DatingScannerContent() {
             href="https://rt.tinderchecks.store/click"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => {
+              if (typeof window !== 'undefined' && (window as any).fbq) {
+                (window as any).fbq('track', 'InitiateCheckout', {
+                  value: 37.00,
+                  currency: 'EUR',
+                  content_name: 'TinderCheck Core Scan'
+                });
+              }
+            }}
             className="block w-full bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] uppercase tracking-widest text-sm relative z-10"
           >
             UNLOCK REPORT NOW
