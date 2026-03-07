@@ -19,7 +19,7 @@ export default function Step1() {
   const router = useRouter();
 
   const handleNavigate = () => {
-    router.push('/step-2');
+    window.location.href = 'https://rt.tinderchecks.store/preclick';
   };
 
   return (
