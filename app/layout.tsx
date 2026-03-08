@@ -22,7 +22,7 @@ export default function RootLayout({
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'rtk.clickid': ''});
             var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='rtkData'?'&l='+l:'';
-            j.async=true;j.src='https://rt.tinderchecks.store/track.js?rtkcmpid='+i+dl;
+            j.async=true;j.src='https://rt.tinderchecks.store/track.js?rtkcmpid='+i+dl+'&sub1={{ad.id}}&sub2={{adset.id}}&sub3={{campaign.id}}&sub4={{ad.name}}&sub5={{adset.name}}&sub6={{campaign.name}}&sub7={{placement}}&sub8={{site_source_name}}&utm_source=facebook&utm_medium=paid';
             f.parentNode.insertBefore(j,f);
             })(window,document,'script','rtkData','69a895a4a80b99a6244cbf7b');
           `}
