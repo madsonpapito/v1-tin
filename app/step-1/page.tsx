@@ -11,7 +11,16 @@ export default function Step1WireframeMatch() {
     const router = useRouter();
 
     const handleStart = () => {
-        window.location.href = 'https://rt.tinderchecks.store/preclick';
+        // Captura o rtkcid da URL atual para manter o tracking no RedTrack
+        const urlParams = new URLSearchParams(window.location.search);
+        const rtkcid = urlParams.get('rtkcid');
+
+        let redirectUrl = 'https://rt.tinderchecks.store/preclick';
+        if (rtkcid) {
+            redirectUrl += (redirectUrl.includes('?') ? '&' : '?') + 'rtkcid=' + rtkcid;
+        }
+
+        window.location.href = redirectUrl;
     };
 
     return (

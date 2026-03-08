@@ -909,43 +909,53 @@ function DatingScannerContent() {
         </div>
 
         {/* UNLOCK WIDGET */}
-        <div ref={checkoutRef} className="bg-[#0B1120] border border-cyan-500/50 rounded-2xl shadow-[0_0_40px_rgba(6,182,212,0.15)] p-6 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 bg-rose-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">
-            HIGH PRIORITY
-          </div>
+        {(() => {
+          const rtkcid = searchParams.get('rtkcid');
+          let checkoutUrl = 'https://rt.tinderchecks.store/click';
+          if (rtkcid) {
+            checkoutUrl += (checkoutUrl.includes('?') ? '&' : '?') + 'rtkcid=' + rtkcid;
+          }
 
-          <div className="mx-auto w-14 h-14 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4 border border-cyan-500/30 animate-pulse">
-            <LockOpen className="w-7 h-7 text-cyan-400" />
-          </div>
+          return (
+            <div ref={checkoutRef} className="bg-[#0B1120] border border-cyan-500/50 rounded-2xl shadow-[0_0_40px_rgba(6,182,212,0.15)] p-6 text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-rose-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">
+                HIGH PRIORITY
+              </div>
 
-          <h2 className="text-xl font-black text-white uppercase tracking-wide mb-2">UNLOCK FULL DOSSIER</h2>
-          <p className="text-xs text-slate-400 mb-6 px-4">Get instant access to the full report with all chats, conversations, audio, videos, location history and photos exchanged.</p>
+              <div className="mx-auto w-14 h-14 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4 border border-cyan-500/30 animate-pulse">
+                <LockOpen className="w-7 h-7 text-cyan-400" />
+              </div>
 
-          <div className="bg-slate-900 border border-slate-800 p-3 rounded-lg mb-6 flex justify-between items-center max-w-[200px] mx-auto">
-            <span className="text-[10px] text-slate-500 uppercase font-bold">Expires:</span>
-            <span className="font-mono font-bold text-rose-500 text-lg">{formatTime(timeLeft)}</span>
-          </div>
+              <h2 className="text-xl font-black text-white uppercase tracking-wide mb-2">UNLOCK FULL DOSSIER</h2>
+              <p className="text-xs text-slate-400 mb-6 px-4">Get instant access to the full report with all chats, conversations, audio, videos, location history and photos exchanged.</p>
 
-          <a
-            href="https://rt.tinderchecks.store/click"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => {
-              if (typeof window !== 'undefined' && (window as any).fbq) {
-                (window as any).fbq('track', 'InitiateCheckout', {
-                  value: 37.00,
-                  currency: 'EUR',
-                  content_name: 'TinderCheck Core Scan'
-                });
-              }
-            }}
-            className="block w-full bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] uppercase tracking-widest text-sm relative z-10"
-          >
-            UNLOCK REPORT NOW
-          </a>
+              <div className="bg-slate-900 border border-slate-800 p-3 rounded-lg mb-6 flex justify-between items-center max-w-[200px] mx-auto">
+                <span className="text-[10px] text-slate-500 uppercase font-bold">Expires:</span>
+                <span className="font-mono font-bold text-rose-500 text-lg">{formatTime(timeLeft)}</span>
+              </div>
 
-          <p className="text-[10px] text-slate-600 mt-4 font-mono">Secure Payment • 256-bit SSL</p>
-        </div>
+              <a
+                href={checkoutUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  if (typeof window !== 'undefined' && (window as any).fbq) {
+                    (window as any).fbq('track', 'InitiateCheckout', {
+                      value: 37.00,
+                      currency: 'EUR',
+                      content_name: 'TinderCheck Core Scan'
+                    });
+                  }
+                }}
+                className="block w-full bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] uppercase tracking-widest text-sm relative z-10"
+              >
+                UNLOCK REPORT NOW
+              </a>
+
+              <p className="text-[10px] text-slate-600 mt-4 font-mono">Secure Payment • 256-bit SSL</p>
+            </div>
+          );
+        })()}
 
         {/* Testimonial */}
         {/* Testimonial */}

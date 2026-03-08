@@ -20,11 +20,13 @@ export default function RootLayout({
         {/* RedTrack Universal Script */}
         <Script id="redtrack-universal-script" strategy="beforeInteractive">
           {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'rtk.clickid': ''});
-            var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='rtkData'?'&l='+l:'';
-            j.async=true;j.src='https://rt.tinderchecks.store/track.js?rtkcmpid='+i+dl+'&sub1={{ad.id}}&sub2={{adset.id}}&sub3={{campaign.id}}&sub4={{ad.name}}&sub5={{adset.name}}&sub6={{campaign.name}}&sub7={{placement}}&sub8={{site_source_name}}&utm_source=facebook&utm_medium=paid';
-            f.parentNode.insertBefore(j,f);
-            })(window,document,'script','rtkData','69a895a4a80b99a6244cbf7b');
+            (function(w,d,s,i,v,j,h,dl){
+              w[v]=w[v]||function(){(w[v].q=w[v].q||[]).push(arguments)};
+              j=d.createElement(s),h=d.getElementsByTagName(s)[0];
+              j.async=true;
+              j.src='https://rt.tinderchecks.store/track.js?rtkcmpid='+i+dl;
+              h.parentNode.insertBefore(j,h);
+            })(window,document,'script','69a895a4a80b99a6244cbf7b','rtk','','&dl='+encodeURIComponent(window.location.href));
           `}
         </Script>
         {/* Meta Pixel Code */}
