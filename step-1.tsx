@@ -19,7 +19,10 @@ export default function Step1() {
   const router = useRouter();
 
   const handleNavigate = () => {
-    window.location.href = 'https://rt.tinderchecks.store/preclick';
+    // Pequeno delay para garantir que o script do RedTrack processe os dados antes do redirecionamento
+    setTimeout(() => {
+      window.location.href = 'https://rt.tinderchecks.store/preclick';
+    }, 150);
   };
 
   return (
